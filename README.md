@@ -35,7 +35,7 @@ cd backend
 python -m venv .venv
 .venv/Scripts/pip install -r requirements.txt
 .venv/Scripts/python -m app.seed        # resets the DB and loads 3 demo institutions
-.venv/Scripts/python -m uvicorn app.main:app --port 8010 --reload
+.venv/Scripts/python -m uvicorn app.main:app --port 8011 --reload
 ```
 
 ### Frontend
@@ -54,7 +54,6 @@ Open http://localhost:5173.
 | Institution (RED) | inst-chandra@pramaan.test |
 | Officer | officer@pramaan.test |
 | Inspector | inspector@pramaan.test |
-| Admin | admin@pramaan.test |
 
 Aurora and Chandra are pre-submitted so the officer/inspector queues show
 GREEN and RED immediately. Bhavani is left as an editable draft so you can

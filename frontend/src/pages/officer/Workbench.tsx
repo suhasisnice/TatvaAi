@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { RefreshCw } from "lucide-react";
+import { RefreshCw, Unlock } from "lucide-react";
 import { api } from "../../lib/api";
 import { TierBadge, SevBadge } from "../../components/Badges";
 
@@ -20,6 +20,13 @@ export default function Workbench() {
   async function revalidate() {
     setBusy(true);
     try { await api.revalidate(Number(id)); load(); } finally { setBusy(false); }
+  }
+
+  async function reopen() {
+    setBusy(true);
+    try { await api.reopen(Number(id)); load(); }
+    catch (err: any) { alert(err.message); }
+    finally { setBusy(false); }
   }
 
   async function decide(flagId: number, decision: "ACCEPT" | "DISMISS") {
@@ -43,7 +50,7 @@ export default function Workbench() {
       <div className="card" style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
         <div>
           <h2 style={{ margin: 0 }}>{app.institution_name}</h2>
-          <p className="muted small" style={{ margin: "4px 0 0" }}>{app.state} &middot; {app.aicte_id} &middot; {app.category} &middot; AY {app.academic_year}</p>
+          <p className="muted small" style={{ margin: "4px 0 0" }}>{app.state} &middot; {app.aicte_id} &middot; {app.category} &middot; AY {app.academic_year} &middot; {app.status}</p>
         </div>
         <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
           <TierBadge tier={app.risk_tier} />
@@ -51,6 +58,11 @@ export default function Workbench() {
           <button className="btn secondary" onClick={revalidate} disabled={busy}>
             <RefreshCw size={14} /> Re-run validation
           </button>
+          {app.status === "SUBMITTED" && app.reopen_count < 1 && (
+            <button className="btn secondary" onClick={reopen} disabled={busy} title="Allowed once (Clause 2.3.3, p.14)">
+              <Unlock size={14} /> Reopen once
+            </button>
+          )}
         </div>
       </div>
 

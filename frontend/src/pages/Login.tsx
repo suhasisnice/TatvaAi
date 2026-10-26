@@ -18,7 +18,7 @@ export default function Login({ onLoggedIn }: { onLoggedIn: () => void }) {
       const session = await api.login(email, password);
       onLoggedIn();
       if (session.role === "institution") navigate("/institution");
-      else if (session.role === "officer" || session.role === "admin") navigate("/officer");
+      else if (session.role === "officer") navigate("/officer");
       else navigate("/inspector");
     } catch (err: any) {
       setError(err.message || "Login failed");
@@ -47,7 +47,7 @@ export default function Login({ onLoggedIn }: { onLoggedIn: () => void }) {
         <div className="demo-accounts">
           Demo password for every account: <code>Pramaan@2026</code><br />
           <code>inst-aurora@pramaan.test</code> &middot; <code>inst-bhavani@pramaan.test</code> &middot; <code>inst-chandra@pramaan.test</code><br />
-          <code>officer@pramaan.test</code> &middot; <code>inspector@pramaan.test</code> &middot; <code>admin@pramaan.test</code>
+          <code>officer@pramaan.test</code> &middot; <code>inspector@pramaan.test</code>
         </div>
       </form>
     </div>

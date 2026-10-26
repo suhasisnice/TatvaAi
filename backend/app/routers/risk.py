@@ -23,7 +23,7 @@ CHECKLIST_TEXT = {
 
 
 @router.get("/queue")
-def queue(user: User = Depends(require_roles("officer", "inspector", "admin")), db: Session = Depends(get_db)):
+def queue(user: User = Depends(require_roles("officer", "inspector")), db: Session = Depends(get_db)):
     apps = db.query(Application).filter(Application.status.in_(["SUBMITTED", "REOPENED"])).all()
     rows = []
     for a in apps:
@@ -53,7 +53,7 @@ def _flag_document(db: Session, flag: Flag) -> Document | None:
 
 
 @router.get("/inspection-list")
-def inspection_list(user: User = Depends(require_roles("officer", "inspector", "admin")), db: Session = Depends(get_db)):
+def inspection_list(user: User = Depends(require_roles("officer", "inspector")), db: Session = Depends(get_db)):
     apps = (
         db.query(Application)
         .filter(Application.status.in_(["SUBMITTED", "REOPENED"]), Application.risk_tier == "RED")

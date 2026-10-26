@@ -10,7 +10,7 @@ router = APIRouter(prefix="/api/v1/audit", tags=["audit"])
 
 
 @router.get("")
-def list_audit(user: User = Depends(require_roles("officer", "admin")), db: Session = Depends(get_db)):
+def list_audit(user: User = Depends(require_roles("officer")), db: Session = Depends(get_db)):
     entries = db.query(AuditLog).order_by(AuditLog.seq.desc()).limit(200).all()
     return [
         {"seq": e.seq, "actor": e.actor, "action": e.action, "entity": e.entity,
@@ -20,5 +20,5 @@ def list_audit(user: User = Depends(require_roles("officer", "admin")), db: Sess
 
 
 @router.get("/verify")
-def verify(user: User = Depends(require_roles("officer", "admin")), db: Session = Depends(get_db)):
+def verify(user: User = Depends(require_roles("officer")), db: Session = Depends(get_db)):
     return verify_chain(db)

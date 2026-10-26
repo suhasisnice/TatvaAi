@@ -43,6 +43,10 @@ a { color: var(--blue); }
 
 .topbar .brand { display: flex; align-items: center; gap: 10px; font-weight: 700; font-size: 18px; letter-spacing: 0.3px; }
 .topbar .brand small { font-weight: 400; opacity: 0.85; font-size: 12px; display: block; }
+.topbar .nav { display: flex; gap: 4px; margin-left: 28px; margin-right: auto; }
+.topbar .nav a { color: rgba(255,255,255,0.8); text-decoration: none; padding: 6px 12px; border-radius: 6px; font-size: 13px; font-weight: 600; }
+.topbar .nav a:hover { background: rgba(255,255,255,0.12); }
+.topbar .nav a.active { background: rgba(255,255,255,0.2); color: white; }
 .topbar .right { display: flex; align-items: center; gap: 16px; font-size: 13px; }
 .topbar .role-pill { background: rgba(255,255,255,0.18); padding: 4px 12px; border-radius: 999px; font-weight: 600; text-transform: capitalize; }
 .topbar button.logout { background: transparent; border: 1px solid rgba(255,255,255,0.5); color: white; padding: 6px 12px; border-radius: 6px; cursor: pointer; }
