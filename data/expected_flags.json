@@ -1,0 +1,129 @@
+{
+  "year": "2027-28",
+  "tiers": {
+    "a": "GREEN",
+    "b": "AMBER",
+    "c": "RED"
+  },
+  "flags": [
+    {
+      "institution": "a",
+      "code": "ISSUER_UNAVAILABLE",
+      "severity": "INFO",
+      "planted": true,
+      "note": "#1 Karnataka fire portal down"
+    },
+    {
+      "institution": "b",
+      "code": "DOC_EXPIRES_BEFORE_AY",
+      "severity": "MAJOR",
+      "planted": true,
+      "note": "#2"
+    },
+    {
+      "institution": "b",
+      "code": "PROVISIONAL_OC_LIMIT_EXCEEDED",
+      "severity": "MAJOR",
+      "planted": true,
+      "note": "#3"
+    },
+    {
+      "institution": "c",
+      "code": "MODIFIED_AFTER_SIGNING",
+      "severity": "CRITICAL",
+      "planted": true,
+      "note": "#4"
+    },
+    {
+      "institution": "c",
+      "code": "TAMPER_SUSPECTED",
+      "severity": "CRITICAL",
+      "planted": true,
+      "note": "#5"
+    },
+    {
+      "institution": "c",
+      "code": "ISSUER_MISMATCH",
+      "severity": "MAJOR",
+      "planted": true,
+      "note": "#6"
+    },
+    {
+      "institution": "c",
+      "code": "QR_MISMATCH",
+      "severity": "MAJOR",
+      "planted": true,
+      "note": "#7"
+    },
+    {
+      "institution": "c",
+      "code": "TIMELINE_IMPOSSIBLE",
+      "severity": "MAJOR",
+      "planted": true,
+      "note": "#8"
+    },
+    {
+      "institution": "c",
+      "code": "DUPLICATE_PHOTO",
+      "severity": "MAJOR",
+      "planted": true,
+      "note": "#9"
+    },
+    {
+      "institution": "c",
+      "code": "PHOTO_GPS_OFFSITE",
+      "severity": "MAJOR",
+      "planted": true,
+      "note": "#10"
+    },
+    {
+      "institution": "c",
+      "code": "DUPLICATE_FACULTY_CROSS_INSTITUTION",
+      "severity": "MAJOR",
+      "planted": true,
+      "note": "#11"
+    },
+    {
+      "institution": "c",
+      "code": "NORM_FACULTY_SHORTFALL",
+      "severity": "MAJOR",
+      "planted": true,
+      "note": "#12"
+    },
+    {
+      "institution": "c",
+      "code": "BUILTUP_AREA_IMPLAUSIBLE",
+      "severity": "MAJOR",
+      "planted": true,
+      "note": "#13"
+    },
+    {
+      "institution": "c",
+      "code": "BUILDING_NOT_VISIBLE_ON_DATE",
+      "severity": "MAJOR",
+      "planted": true,
+      "note": "#14"
+    },
+    {
+      "institution": "c",
+      "code": "DISCLOSURE_MISMATCH",
+      "severity": "MAJOR",
+      "planted": true,
+      "note": "#15"
+    },
+    {
+      "institution": "c",
+      "code": "MISMATCH_CROSS_DOC",
+      "severity": "MAJOR",
+      "planted": false,
+      "note": "optional consequence of #4"
+    },
+    {
+      "institution": "b",
+      "code": "ISSUER_UNAVAILABLE",
+      "severity": "INFO",
+      "planted": false,
+      "note": "optional: Maharashtra occupancy has no API"
+    }
+  ]
+}

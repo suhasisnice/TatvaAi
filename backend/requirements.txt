@@ -8,3 +8,13 @@ jsonschema
 simpleeval
 pytest
 httpx
+pyhanko
+qrcode
+pymupdf
+imagehash
+faker
+pyzbar
+piexif
+cryptography
+reportlab
+pillow
