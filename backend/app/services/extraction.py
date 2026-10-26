@@ -2,7 +2,7 @@
 
 Lazy-but-real: reads the PDF text layer with pypdf and parses "Label: Value"
 lines. No OCR/layout model — our synthetic documents have a text layer, so
-this mirrors PramaanAI's own text-layer path (OCR is optional there too).
+this mirrors TatvaAI's own text-layer path (OCR is optional there too).
 """
 import hashlib
 import re

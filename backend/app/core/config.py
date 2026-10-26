@@ -5,8 +5,8 @@ BASE_DIR = Path(__file__).resolve().parent.parent.parent
 UPLOAD_DIR = BASE_DIR / "uploads"
 UPLOAD_DIR.mkdir(exist_ok=True)
 
-DATABASE_URL = os.environ.get("DATABASE_URL", f"sqlite:///{BASE_DIR / 'pramaan.db'}")
-JWT_SECRET = os.environ.get("JWT_SECRET", "dev-secret-change-me-tatvai-pramaanai")
+DATABASE_URL = os.environ.get("DATABASE_URL", f"sqlite:///{BASE_DIR / 'tatva.db'}")
+JWT_SECRET = os.environ.get("JWT_SECRET", "dev-secret-change-me-tatvaai")
 JWT_ALGORITHM = "HS256"
 ACCESS_TOKEN_MINUTES = 120
 

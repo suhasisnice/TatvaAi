@@ -6,7 +6,7 @@ from app.routers import auth, applications, risk, audit_router, alerts
 
 Base.metadata.create_all(bind=engine)
 
-app = FastAPI(title="TatvaAI / PramaanAI prototype", version="0.1.0")
+app = FastAPI(title="TatvaAI prototype", version="0.1.0")
 
 app.add_middleware(
     CORSMiddleware,

@@ -1,4 +1,4 @@
-# TatvaAI (PramaanAI prototype) &mdash; SIH26261
+# TatvaAI prototype &mdash; SIH26261
 
 AI-powered application validation, document authentication and regulatory
 compliance verification for AICTE's Extension of Approval process.
@@ -46,14 +46,14 @@ npm run dev
 ```
 Open http://localhost:5173.
 
-### Demo accounts (password `Pramaan@2026` for all)
+### Demo accounts (password `Tatva@2026` for all)
 | Role | Email |
 |---|---|
-| Institution (GREEN) | inst-aurora@pramaan.test |
-| Institution (AMBER, left as draft) | inst-bhavani@pramaan.test |
-| Institution (RED) | inst-chandra@pramaan.test |
-| Officer | officer@pramaan.test |
-| Inspector | inspector@pramaan.test |
+| Institution (GREEN) | inst-aurora@tatva.test |
+| Institution (AMBER, left as draft) | inst-bhavani@tatva.test |
+| Institution (RED) | inst-chandra@tatva.test |
+| Officer | officer@tatva.test |
+| Inspector | inspector@tatva.test |
 
 Aurora and Chandra are pre-submitted so the officer/inspector queues show
 GREEN and RED immediately. Bhavani is left as an editable draft so you can
@@ -63,4 +63,4 @@ run pre-check and submit live (AMBER, score 30) during a demo recording.
 Pick a category when starting a new application (Extension of Approval, Increase in intake, Change of
 institution name). Sample documents for the last two are generated at
 `backend/data/synthetic/aurora/` (`affidavit_8.pdf`, `trust_resolution.pdf`,
-`noc_affiliating_university.pdf`); upload them as `inst-aurora@pramaan.test`.
+`noc_affiliating_university.pdf`); upload them as `inst-aurora@tatva.test`.

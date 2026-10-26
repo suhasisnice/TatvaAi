@@ -1,4 +1,4 @@
-# TatvaAI / PramaanAI — 10-phase work plan
+# TatvaAI — 10-phase work plan
 
 Starting point: the lean demo already pushed to the repo (3 dashboards, 5-engine
 rule-based pipeline, GREEN/AMBER/RED scoring, inspector checklist, hash-chained

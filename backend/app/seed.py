@@ -14,7 +14,7 @@ from app.models import (
 from app.services import extraction, pipeline, alerts
 from app.services.generate_docs import generate_all, DATA_DIR
 
-DEMO_PASSWORD = "Pramaan@2026"
+DEMO_PASSWORD = "Tatva@2026"
 
 def infrastructure(courses, professors, associates, classrooms, tutorial, labs, pcs, printers, bandwidth):
     """Declared figures, deliberately a little above the Handbook minimum so only
@@ -112,11 +112,11 @@ def main():
     db.commit()
 
     users = [
-        ("inst-aurora@pramaan.test", "Aurora Registrar", "institution", "aurora"),
-        ("inst-bhavani@pramaan.test", "Bhavani Registrar", "institution", "bhavani"),
-        ("inst-chandra@pramaan.test", "Chandra Registrar", "institution", "chandra"),
-        ("officer@pramaan.test", "Regulation Bureau Officer", "officer", None),
-        ("inspector@pramaan.test", "EVC Inspector", "inspector", None),
+        ("inst-aurora@tatva.test", "Aurora Registrar", "institution", "aurora"),
+        ("inst-bhavani@tatva.test", "Bhavani Registrar", "institution", "bhavani"),
+        ("inst-chandra@tatva.test", "Chandra Registrar", "institution", "chandra"),
+        ("officer@tatva.test", "Regulation Bureau Officer", "officer", None),
+        ("inspector@tatva.test", "EVC Inspector", "inspector", None),
     ]
     for email, name, role, slug in users:
         db.add(User(
@@ -163,7 +163,7 @@ def main():
             alerts.generate_alerts(db, app_obj)
 
     db.close()
-    print("Seed complete. Demo users (password Pramaan@2026):")
+    print("Seed complete. Demo users (password Tatva@2026):")
     for email, name, role, slug in users:
         print(f"  {role:10s} {email}")
 
