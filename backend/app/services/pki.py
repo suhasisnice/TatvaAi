@@ -1,6 +1,6 @@
 """Throwaway test PKI for the synthetic demo documents.
 
-One root CA ("PramaanAI Test Root CA (Synthetic)") issues a signing
+One root CA ("TatvaAI Test Root CA (Synthetic)") issues a signing
 certificate per signer name ("Karnataka Fire Department", an institution's
 Trust, ...). The backend trusts only this root. Keys are generated on demand
 and cached under backend/data/pki (gitignored). Nothing here is valid
@@ -21,13 +21,13 @@ from pyhanko_certvalidator.registry import SimpleCertificateStore
 PKI_DIR = Path(__file__).resolve().parent.parent.parent / "data" / "pki"
 ROOT_CERT = PKI_DIR / "root.pem"
 ROOT_KEY = PKI_DIR / "root.key"
-ROOT_NAME = "PramaanAI Test Root CA (Synthetic)"
+ROOT_NAME = "TatvaAI Test Root CA (Synthetic)"
 _NOW = datetime(2026, 1, 1, tzinfo=timezone.utc)
 
 
 def _name(common_name: str) -> x509.Name:
     return x509.Name([
-        x509.NameAttribute(NameOID.ORGANIZATION_NAME, "PramaanAI Test PKI (Synthetic)"),
+        x509.NameAttribute(NameOID.ORGANIZATION_NAME, "TatvaAI Test PKI (Synthetic)"),
         x509.NameAttribute(NameOID.COMMON_NAME, common_name),
     ])
 

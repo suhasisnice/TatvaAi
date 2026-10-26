@@ -3,7 +3,7 @@
 Deterministic and rule-based throughout: hash/text/field comparisons and a
 real perceptual-hash photo-duplicate check (Pillow/imagehash). No OCR/layout
 models or image forensics are run here -- those are the heavy, optional
-pieces the PramaanAI guide itself lists as off-by-default feature flags
+pieces the TatvaAI guide itself lists as off-by-default feature flags
 (FEATURE_OCR, FEATURE_YOLO, ...); this prototype wires the same five-engine,
 evidence-first architecture without them so it is fully demoable today.
 """

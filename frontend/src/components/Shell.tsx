@@ -19,7 +19,7 @@ export default function Shell({ session, children }: { session: Session; childre
           <ShieldCheck size={22} />
           <div>
             TatvaAI
-            <small>PramaanAI &mdash; AICTE application validation prototype</small>
+            <small>TatvaAI &mdash; AICTE application validation prototype</small>
           </div>
         </div>
         {session.role === "officer" && (

@@ -4,8 +4,8 @@ import { ShieldCheck } from "lucide-react";
 import { api } from "../lib/api";
 
 export default function Login({ onLoggedIn }: { onLoggedIn: () => void }) {
-  const [email, setEmail] = useState("officer@pramaan.test");
-  const [password, setPassword] = useState("Pramaan@2026");
+  const [email, setEmail] = useState("officer@tatva.test");
+  const [password, setPassword] = useState("Tatva@2026");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
@@ -32,7 +32,7 @@ export default function Login({ onLoggedIn }: { onLoggedIn: () => void }) {
       <form className="login-card" onSubmit={submit}>
         <ShieldCheck size={28} color="#0d5c9e" />
         <h1>TatvaAI</h1>
-        <p className="sub">PramaanAI &mdash; AI-powered application validation, document authentication &amp;
+        <p className="sub">TatvaAI &mdash; AI-powered application validation, document authentication &amp;
           regulatory compliance verification for AICTE (SIH26261)</p>
 
         <label>Email</label>
@@ -45,9 +45,9 @@ export default function Login({ onLoggedIn }: { onLoggedIn: () => void }) {
         </button>
 
         <div className="demo-accounts">
-          Demo password for every account: <code>Pramaan@2026</code><br />
-          <code>inst-aurora@pramaan.test</code> &middot; <code>inst-bhavani@pramaan.test</code> &middot; <code>inst-chandra@pramaan.test</code><br />
-          <code>officer@pramaan.test</code> &middot; <code>inspector@pramaan.test</code>
+          Demo password for every account: <code>Tatva@2026</code><br />
+          <code>inst-aurora@tatva.test</code> &middot; <code>inst-bhavani@tatva.test</code> &middot; <code>inst-chandra@tatva.test</code><br />
+          <code>officer@tatva.test</code> &middot; <code>inspector@tatva.test</code>
         </div>
       </form>
     </div>
