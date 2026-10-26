@@ -16,19 +16,33 @@ from app.services.generate_docs import generate_all, DATA_DIR
 
 DEMO_PASSWORD = "Pramaan@2026"
 
+def infrastructure(courses, professors, associates, classrooms, tutorial, labs, pcs, printers, bandwidth):
+    """Declared figures, deliberately a little above the Handbook minimum so only
+    the planted problems (Chandra's faculty shortfall) fail a norm."""
+    return dict(
+        courses=courses, professors=professors, associate_professors=associates,
+        classrooms=classrooms, tutorial_rooms=tutorial, labs=labs, pcs=pcs, printers=printers,
+        bandwidth_mbps=bandwidth, classroom_area_m2=70, workshop_area_m2=220, computer_centre_area_m2=160,
+        seminar_hall_area_m2=140, library_area_m2=420, language_lab_area_m2=36,
+    )
+
+
 INSTITUTIONS = [
     dict(slug="aurora", name="Aurora Institute of Technology (Synthetic)", state="Karnataka",
          aicte_id="SYN-AICTE-1001", trust_name="Aurora Vidya Trust", survey_no="SY-42/3A",
          declared_faculty=26, declared_built_up_m2=6100, footprint_estimate_m2=6000,
-         approved_intake=480, website_faculty_count=26),
+         approved_intake=480, website_faculty_count=26,
+         infrastructure=infrastructure(2, 4, 8, 6, 3, 18, 60, 4, 200)),
     dict(slug="bhavani", name="Bhavani College of Engineering (Synthetic)", state="Maharashtra",
          aicte_id="SYN-AICTE-1002", trust_name="Bhavani Shiksha Samiti", survey_no="SY-77/1",
          declared_faculty=42, declared_built_up_m2=10100, footprint_estimate_m2=10000,
-         approved_intake=720, website_faculty_count=42),
+         approved_intake=720, website_faculty_count=42,
+         infrastructure=infrastructure(3, 6, 12, 8, 3, 24, 84, 6, 200)),
     dict(slug="chandra", name="Chandra Technical Campus (Synthetic)", state="Tamil Nadu",
          aicte_id="SYN-AICTE-1003", trust_name="Chandra Educational Society", survey_no="SY-118/4B",
          declared_faculty=109, declared_built_up_m2=31500, footprint_estimate_m2=24100,
-         approved_intake=2400, website_faculty_count=85),
+         approved_intake=2400, website_faculty_count=85,
+         infrastructure=infrastructure(5, 12, 24, 22, 7, 36, 252, 14, 600)),
 ]
 
 DOC_FILES = {

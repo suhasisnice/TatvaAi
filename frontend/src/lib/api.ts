@@ -42,6 +42,7 @@ export const api = {
   logout() {
     setSession(null);
   },
+  categories: () => request("/api/v1/applications/categories"),
   listApplications: () => request("/api/v1/applications"),
   createApplication: (academic_year: string, category = "EOA") =>
     request("/api/v1/applications", { method: "POST", body: JSON.stringify({ academic_year, category }) }),

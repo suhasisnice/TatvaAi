@@ -58,3 +58,9 @@ Open http://localhost:5173.
 Aurora and Chandra are pre-submitted so the officer/inspector queues show
 GREEN and RED immediately. Bhavani is left as an editable draft so you can
 run pre-check and submit live (AMBER, score 30) during a demo recording.
+
+### Trying the other application types
+Pick a category when starting a new application (Extension of Approval, Increase in intake, Change of
+institution name). Sample documents for the last two are generated at
+`backend/data/synthetic/aurora/` (`affidavit_8.pdf`, `trust_resolution.pdf`,
+`noc_affiliating_university.pdf`); upload them as `inst-aurora@pramaan.test`.

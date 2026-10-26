@@ -108,6 +108,29 @@ def generate_all():
         "Entity: Aurora Vidya Trust",
         "Financial Year: 2026-27",
     ])
+    # Extra documents for the other two categories (not part of Aurora's seeded EoA
+    # application -- upload them in the UI to try Increase in intake / Name change).
+    make_pdf(a / "affidavit_8.pdf", [
+        "AFFIDAVIT 8",
+        "Digitally Signed By: Aurora Vidya Trust",
+        "Institution Name: Aurora Institute of Technology (Synthetic)",
+        "Trust Name: Aurora Vidya Trust",
+        "Additional Intake: 60",
+    ])
+    make_pdf(a / "trust_resolution.pdf", [
+        "TRUST RESOLUTION",
+        "Digitally Signed By: Aurora Vidya Trust",
+        "Institution Name: Aurora Institute of Technology (Synthetic)",
+        "Trust Name: Aurora Vidya Trust",
+        "Resolution Date: 2027-01-05",
+    ])
+    make_pdf(a / "noc_affiliating_university.pdf", [
+        "NO OBJECTION CERTIFICATE",
+        "Digitally Signed By: Affiliating University Registrar",
+        "Institution Name: Aurora Institute of Technology (Synthetic)",
+        "Trust Name: Aurora Vidya Trust",
+        "Proposed New Name: Aurora Institute of Engineering (Synthetic)",
+    ])
     make_photo(a / "lab_photo.jpg", (60, 110, 160), "Aurora - Computer Lab", seed=1001)
     (a / "faculty_list.csv").write_text(
         "faculty_id,name,full_time\n" + "\n".join(f"AUR-F{i:03d},Faculty {i},true" for i in range(1, 27)),

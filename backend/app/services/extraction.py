@@ -18,6 +18,9 @@ TITLE_KEYWORDS = {
     "SATELLITE_MAP": ["satellite map"],
     "AUDITED_ACCOUNTS": ["audited statement", "statement of accounts"],
     "LAND_DOCUMENT": ["land ownership", "sale deed", "land record"],
+    "AFFIDAVIT_8": ["affidavit 8", "affidavit-8"],
+    "NOC_AFFILIATING_UNIVERSITY": ["no objection certificate", "affiliating university"],
+    "TRUST_RESOLUTION": ["trust resolution", "resolution of the"],
 }
 
 LABEL_LINE = re.compile(r"^\s*([A-Za-z][A-Za-z0-9 /_-]{1,40}):\s*(.+?)\s*$")

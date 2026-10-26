@@ -13,7 +13,7 @@ from datetime import datetime, date
 from sqlalchemy.orm import Session
 
 from app.models import Application, Document, Institution, IssuerRecord, FacultyRegistryEntry
-from app.services.categories import CATEGORIES
+from app.services.categories import CATEGORIES, applies_norms
 from app.core.config import ACADEMIC_YEAR_START, SUBMISSION_DEADLINE
 
 SEVERITY_WEIGHT = {"CRITICAL": 40, "MAJOR": 15, "MINOR": 5, "INFO": 0}
@@ -252,7 +252,7 @@ def consistency_engine(application: Application, documents: list[Document], inst
 
     # Duplicate faculty across institutions
     faculty_doc = next((d for d in documents if d.doc_type == "FACULTY_LIST"), None)
-    if faculty_doc:
+    if applies_norms(application.category) and faculty_doc:
         dup_ids = faculty_doc.extracted_fields.get("_duplicate_faculty_ids", [])
         if dup_ids:
             flags.append(dict(
@@ -265,7 +265,7 @@ def consistency_engine(application: Application, documents: list[Document], inst
             ))
 
     # Public disclosure mismatch
-    if institution.website_faculty_count is not None and institution.declared_faculty:
+    if applies_norms(application.category) and institution.website_faculty_count is not None and institution.declared_faculty:
         if institution.website_faculty_count != institution.declared_faculty:
             flags.append(dict(
                 engine="consistency", code="DISCLOSURE_MISMATCH", severity="MAJOR", confidence=1.0,
@@ -327,3 +327,97 @@ def built_up_area_flag(institution: Institution, footprint_estimate_m2: float) -
             fingerprint=_fp("compliance", "BUILTUP_AREA_IMPLAUSIBLE", None, institution.slug),
         )
     return None
+
+
+def required_infrastructure(institution: Institution) -> dict:
+    """Handbook minimums derived from approved intake (Annexures 3, 4 and 5).
+    Assumes 4-year UG Engineering courses of 60-seat divisions, as in the demo data."""
+    infra = institution.infrastructure or {}
+    total_intake = institution.approved_intake or 0      # S: intake summed over all years
+    duration = 4
+    annual = total_intake / duration
+    divisions = math.ceil(annual / 60)
+    courses = int(infra.get("courses", 1))
+    classrooms = math.ceil(divisions * duration * 0.5)
+    pcs = max(20, math.ceil(total_intake / 10))
+    if annual <= 300:
+        bandwidth = 100
+    elif annual <= 600:
+        bandwidth = 300
+    elif annual <= 900:
+        bandwidth = 500
+    else:
+        bandwidth = 1000
+    return {
+        "classrooms": classrooms,
+        "tutorial_rooms": math.ceil(classrooms * 0.25),
+        "labs": 4 + 2 * courses * (duration - 1),
+        "pcs": pcs,
+        "printers": math.ceil(pcs * 0.05),
+        "bandwidth_mbps": bandwidth,
+    }
+
+
+# (infra key, minimum area m2, label, citation)
+AREA_NORMS = [
+    ("classroom_area_m2", 66, "Classroom carpet area", "Annexure-3, 3.2.1 A, p.87"),
+    ("workshop_area_m2", 200, "Workshop area", "Annexure-3, 3.2.1 A, p.87"),
+    ("computer_centre_area_m2", 150, "Computer centre area", "Annexure-3, 3.2.1 A, p.88"),
+    ("seminar_hall_area_m2", 132, "Seminar hall area", "Annexure-3, 3.2.1 A, p.88"),
+    ("library_area_m2", 400, "Library area", "Annexure-3, 3.2.1 A, p.88"),
+    ("language_lab_area_m2", 33, "Language laboratory area", "Annexure-3, 3.2.1 A, p.88"),
+]
+
+
+def norm_flags(institution: Institution, valid_faculty: int) -> list[dict]:
+    """Cadre, rooms, areas, PCs, printers and bandwidth against Handbook norms.
+    Skipped when the institution declared no infrastructure figures."""
+    infra = institution.infrastructure or {}
+    if not infra:
+        return []
+    flags = []
+
+    def flag(code, severity, message, explanation, citation, key):
+        flags.append(dict(
+            engine="compliance", code=code, severity=severity, confidence=1.0, forensic=False,
+            message=message, explanation=explanation, citation=citation, evidence=[],
+            fingerprint=_fp("compliance", code, None, f"{institution.slug}:{key}"),
+        ))
+
+    # Cadre 1:2:6 for UG Engineering (Annexure-5, p.95-96)
+    need_prof, need_assoc = math.ceil(valid_faculty / 9), math.ceil(2 * valid_faculty / 9)
+    prof, assoc = infra.get("professors", 0), infra.get("associate_professors", 0)
+    if valid_faculty and (prof < need_prof or assoc < need_assoc):
+        flag("NORM_CADRE_RATIO", "MINOR",
+             f"Cadre below 1:2:6 - professors {prof}/{need_prof}, associate professors {assoc}/{need_assoc}",
+             "Annexure-5, 5.2, p.95-96: Professor : Associate : Assistant = 1 : 2 : 6.",
+             "Annexure-5, 5.2, p.95-96", "cadre")
+
+    need = required_infrastructure(institution)
+
+    if infra.get("classrooms", 0) < need["classrooms"]:
+        flag("NORM_ROOMS", "MAJOR", f"Classrooms declared {infra.get('classrooms', 0)}, required {need['classrooms']}",
+             "Classrooms = divisions x course duration x 0.5.", "Annexure-3, 3.2.1 A, p.87", "classrooms")
+    if infra.get("tutorial_rooms", 0) < need["tutorial_rooms"]:
+        flag("NORM_ROOMS", "MINOR", f"Tutorial rooms declared {infra.get('tutorial_rooms', 0)}, required {need['tutorial_rooms']}",
+             "Tutorial rooms = 25% of classrooms.", "Annexure-3, 3.2.1 A, p.87", "tutorial")
+    if infra.get("labs", 0) < need["labs"]:
+        flag("NORM_ROOMS", "MAJOR", f"Laboratories declared {infra.get('labs', 0)}, required {need['labs']}",
+             "4 first-year laboratories plus 2 per course for each later year.", "Annexure-3, 3.2.1 A, p.87", "labs")
+
+    for key, minimum, label, citation in AREA_NORMS:
+        if key in infra and infra[key] < minimum:
+            flag("NORM_AREA", "MINOR", f"{label} {infra[key]} m², minimum {minimum} m²",
+                 "Handbook room sizes are carpet areas.", citation, key)
+
+    if infra.get("pcs", 0) < need["pcs"]:
+        flag("NORM_PC_RATIO", "MAJOR", f"PCs declared {infra.get('pcs', 0)}, required {need['pcs']}",
+             "PC-to-student ratio 1:10 with a minimum of 20.", "Annexure-4, 4.1, p.92", "pcs")
+    if infra.get("printers", 0) < need["printers"]:
+        flag("NORM_PC_RATIO", "MINOR", f"Printers declared {infra.get('printers', 0)}, required {need['printers']}",
+             "Printers at least 5% of PCs.", "Annexure-4, 4.1 note 3, p.92", "printers")
+    if infra.get("bandwidth_mbps", 0) < need["bandwidth_mbps"]:
+        flag("NORM_BANDWIDTH", "MINOR",
+             f"Bandwidth declared {infra.get('bandwidth_mbps', 0)} Mbps, required {need['bandwidth_mbps']} Mbps",
+             "Internet bandwidth by approved intake.", "Annexure-4, 4.1 note 5, p.92", "bandwidth")
+    return flags
