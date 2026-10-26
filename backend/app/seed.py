@@ -66,19 +66,13 @@ def ingest_document(db, app_obj: Application, src: Path, upload_dir: Path):
     dest = dest_dir / src.name
     dest.write_bytes(src.read_bytes())
 
-    text = extraction.extract_text(dest)
-    doc_type, confidence = extraction.classify(src.name, text)
-    fields = extraction.extract_fields(text)
-    signed, signer = extraction.signature_marker(text)
-    fields["_signed"] = signed
-    fields["_signer"] = signer
-    tampered = [ln for ln in text.splitlines() if ln.strip().lower().startswith("tampered-field:")]
-    if tampered:
-        fields["_tampered_field"] = tampered[0].split(":", 1)[1].strip()
+    doc_type, confidence, fields = extraction.analyze(dest, src.name)
+    signed = fields["_signed"]
 
     if doc_type == "FACULTY_LIST":
         import csv as csv_mod
         fields["_signed"] = True
+        fields["_sig"] = {"status": "NOT_APPLICABLE", "signer": None, "changed_fields": []}
         with open(dest, newline="", encoding="utf-8") as f:
             rows = list(csv_mod.DictReader(f))
         ids = [r["faculty_id"] for r in rows if r.get("faculty_id")]
@@ -93,7 +87,7 @@ def ingest_document(db, app_obj: Application, src: Path, upload_dir: Path):
     doc = Document(
         application_id=app_obj.id, doc_type=doc_type, file_name=src.name, storage_path=str(dest),
         sha256=extraction.sha256_file(dest), classification_confidence=confidence,
-        signed=signed, extracted_fields=fields,
+        signed=signed, signature_status=fields["_sig"]["status"], extracted_fields=fields,
     )
     db.add(doc)
     db.commit()

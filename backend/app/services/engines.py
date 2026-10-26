@@ -109,25 +109,23 @@ def issuer_and_authenticity_engine(documents: list[Document], issuer_records: di
     for doc in documents:
         rec: IssuerRecord | None = issuer_records.get(doc.doc_type)
 
-        # --- authenticity: signature / modification ---
-        signed = bool(doc.extracted_fields.get("_signed"))
-        tampered_field = doc.extracted_fields.get("_tampered_field")
-        sig_status = "UNSIGNED"
-        if signed:
-            if rec and rec.registered_sha256 and rec.registered_sha256 != doc.sha256:
-                sig_status = "SIGNED_MODIFIED"
-            else:
-                sig_status = "SIGNED_VALID"
+        # --- authenticity: real signature status (pyHanko, see services/signature.py) ---
+        sig = doc.extracted_fields.get("_sig") or {"status": "UNSIGNED", "changed_fields": []}
+        sig_status = sig["status"]
         doc.signature_status = sig_status
+        tampered_field = doc.extracted_fields.get("_tampered_field")
+        title = doc.doc_type.replace("_", " ").title()
 
         if sig_status == "SIGNED_MODIFIED":
+            changes = sig.get("changed_fields") or []
+            what = "; ".join(f"'{c['field']}' was '{c['was']}' when signed, now '{c['now']}'" for c in changes)                 or "content differs from the signed revision"
             flags.append(dict(
                 engine="authenticity", code="MODIFIED_AFTER_SIGNING", severity="CRITICAL", confidence=1.0,
                 forensic=False,
-                message=f"{doc.doc_type.replace('_', ' ').title()} content changed after it was digitally signed",
-                explanation=f"The file's SHA-256 no longer matches the hash recorded at signing time; field "
-                            f"'{tampered_field}' now reads '{doc.extracted_fields.get(tampered_field)}'.",
-                citation="Annexure-2 (i), p.81", evidence=[{"document_id": doc.id, "field": tampered_field}],
+                message=f"{title} content changed after it was digitally signed",
+                explanation=f"Signed by {sig.get('signer')}; the signature covers only an earlier revision. {what}.",
+                citation="Annexure-2 (i), p.81",
+                evidence=[{"document_id": doc.id, "field": c["field"]} for c in changes] or [{"document_id": doc.id}],
                 fingerprint=_fp("authenticity", "MODIFIED_AFTER_SIGNING", doc.id),
             ))
             if tampered_field:
@@ -140,8 +138,17 @@ def issuer_and_authenticity_engine(documents: list[Document], issuer_records: di
                     citation="", evidence=[{"document_id": doc.id, "field": tampered_field}],
                     fingerprint=_fp("authenticity", "TAMPER_SUSPECTED", doc.id),
                 ))
-        elif sig_status == "UNSIGNED":
-            pass  # DOC_UNSIGNED already raised by completeness engine
+        elif sig_status in ("SIGNED_INVALID", "SIGNED_UNTRUSTED"):
+            invalid = sig_status == "SIGNED_INVALID"
+            flags.append(dict(
+                engine="authenticity", code="SIGNATURE_INVALID", severity="CRITICAL" if invalid else "MAJOR",
+                confidence=1.0, forensic=False,
+                message=f"{title} signature is invalid" if invalid else f"{title} signer is not trusted",
+                explanation="The signed bytes were altered or the signature does not verify." if invalid else
+                            f"Signed by '{sig.get('signer')}', which does not chain to a trusted certificate authority.",
+                citation="Clause 2.3.4 (a), p.15", evidence=[{"document_id": doc.id}],
+                fingerprint=_fp("authenticity", "SIGNATURE_INVALID", doc.id),
+            ))
 
         qr_valid_till = doc.extracted_fields.get("qr_valid_till")
         printed_valid_till = doc.extracted_fields.get("valid_till")

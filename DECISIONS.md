@@ -17,9 +17,8 @@ add first.
   GREEN/AMBER/RED scoring, same severity weights and thresholds as the guide
   (CRITICAL 40 / MAJOR 15 / MINOR 5 / INFO 0; RED on any CRITICAL or score
   &ge;60; AMBER on any MAJOR or score &ge;20).
-- Real SHA-256 integrity checks (a tampered document's hash genuinely no
-  longer matches the issuer's registered hash &mdash; this is how
-  `MODIFIED_AFTER_SIGNING` is detected, not a hardcoded flag).
+- Real PDF signature validation (pyHanko): `MODIFIED_AFTER_SIGNING` comes from the signature
+  itself, and the issuer check separately compares the file hash with the issuer's record.
 - Real perceptual-hash photo-duplicate detection (Pillow + imagehash) across
   institutions &mdash; the planted "Chandra reused Aurora's lab photo" case is
   caught by an actual image comparison, not a lookup table.
@@ -30,14 +29,15 @@ add first.
   verification; no reject/approve endpoint exists anywhere.
 
 ## What's simplified, and why
-- **No real PKI / pyHanko DSC signing.** A full certificate authority +
-  per-document signing pipeline was out of scope for one session. Documents
-  carry a `Digitally Signed By:` text marker instead, and "signature
-  validity" is simulated by comparing the file's SHA-256 against the hash
-  the mock issuer registered at signing time. This preserves the property
-  being demonstrated (any post-signing edit is detectable) without the PKI
-  machinery. **Upgrade path:** `scripts/make_test_pki.py` + pyHanko, as in
-  the guide.
+- **Digital signatures are real; the PKI is a throwaway.** Every PDF is signed with pyHanko
+  by a certificate from a test root CA (`services/pki.py`, keys cached in `backend/data/pki`,
+  gitignored), and `services/signature.py` validates them: SIGNED_VALID / SIGNED_MODIFIED /
+  SIGNED_INVALID / SIGNED_UNTRUSTED / UNSIGNED. Chandra's land record is a genuine post-signing
+  edit (an incremental update), and the flag names the changed field by diffing the signed
+  revision against the current file. Nothing real trusts this CA; real DSCs come from licensed
+  Indian CAs, so production would load their roots instead. Keys are random per machine (not
+  seeded), so file hashes differ between seed runs. Faculty CSVs cannot carry a PDF signature
+  and show NOT_APPLICABLE.
 - **No OCR/LayoutLM/YOLO/face-recognition.** All demo documents have a text
   layer (pypdf reads it directly), so OCR was never required for the demo
   to work; the heavier models stay on the roadmap, exactly as the guide
@@ -65,7 +65,7 @@ add first.
 - **SQLite, not PostgreSQL+PostGIS/MinIO.** `DATABASE_URL` is swappable.
 
 ## Immediate next steps if continuing past the demo
-1. Swap the text-marker signing for real pyHanko DSC signing.
+1. (done in phase 4: real pyHanko signing and validation)
 2. Add the font/ELA forensic detector for `TAMPER_SUSPECTED`.
 3. Pull built-up-area and photo-GPS checks onto real geo data.
 4. Split mock issuers into their own service (matches the guide's

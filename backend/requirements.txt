@@ -11,3 +11,5 @@ pillow==10.4.0
 imagehash==4.3.1
 reportlab==4.2.2
 pypdf==4.3.1
+pyhanko==0.25.3
+cryptography>=42

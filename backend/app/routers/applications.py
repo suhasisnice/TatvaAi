@@ -141,18 +141,12 @@ async def upload_document(app_id: int, file: UploadFile = File(...),
         dest.unlink()
         raise HTTPException(status_code=400, detail=f"File exceeds {MAX_UPLOAD_MB} MB")
 
-    text = extraction.extract_text(dest)
-    doc_type, confidence = extraction.classify(file.filename, text)
-    fields = extraction.extract_fields(text)
-    signed, signer = extraction.signature_marker(text)
-    fields["_signed"] = signed
-    fields["_signer"] = signer
-    tampered_match = [ln for ln in text.splitlines() if ln.strip().lower().startswith("tampered-field:")]
-    if tampered_match:
-        fields["_tampered_field"] = tampered_match[0].split(":", 1)[1].strip()
+    doc_type, confidence, fields = extraction.analyze(dest, file.filename)
+    signed = fields["_signed"]
 
     if doc_type == "FACULTY_LIST":
-        fields["_signed"] = True  # a CSV roster carries no signature line; treated as institution-authored data
+        fields["_signed"] = True  # a CSV roster cannot carry a PDF signature; treated as institution-authored data
+        fields["_sig"] = {"status": "NOT_APPLICABLE", "signer": None, "changed_fields": []}
         with open(dest, newline="", encoding="utf-8") as f:
             rows = list(csv.DictReader(f))
         ids = [r["faculty_id"] for r in rows if r.get("faculty_id")]
@@ -168,7 +162,7 @@ async def upload_document(app_id: int, file: UploadFile = File(...),
     doc = Document(
         application_id=app_id, doc_type=doc_type, file_name=file.filename, storage_path=str(dest),
         sha256=extraction.sha256_file(dest), classification_confidence=confidence,
-        signed=signed, extracted_fields=fields,
+        signed=signed, signature_status=fields["_sig"]["status"], extracted_fields=fields,
     )
     db.add(doc)
     db.commit()
