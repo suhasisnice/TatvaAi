@@ -76,9 +76,17 @@ def extract_fields(text: str) -> dict:
     return fields
 
 
-def signature_marker(text: str) -> tuple[bool, str | None]:
-    """Returns (signed, signer) based on a 'Digitally Signed By:' line."""
-    m = re.search(r"digitally signed by:\s*(.+)", text, re.IGNORECASE)
-    if m:
-        return True, m.group(1).strip()
-    return False, None
+def analyze(path: Path, filename: str) -> tuple[str, float, dict]:
+    """Classify a stored upload and extract its fields, including real signature status."""
+    from app.services import signature
+    text = extract_text(path)
+    doc_type, confidence = classify(filename, text)
+    fields = extract_fields(text)
+    sig = signature.inspect(path)
+    fields["_sig"] = sig
+    fields["_signed"] = sig["status"] != "UNSIGNED"
+    fields["_signer"] = sig["signer"]
+    marker = [ln for ln in text.splitlines() if ln.strip().lower().startswith("tampered-field:")]
+    if marker:
+        fields["_tampered_field"] = marker[0].split(":", 1)[1].strip()
+    return doc_type, confidence, fields

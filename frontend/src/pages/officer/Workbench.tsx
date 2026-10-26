@@ -153,7 +153,7 @@ export default function Workbench() {
                 <div className="name">{d.doc_type.replace(/_/g, " ")}</div>
                 <div className="type">{d.file_name} &middot; sha256 {d.sha256}&hellip; &middot; classified {Math.round(d.classification_confidence * 100)}% confident</div>
               </div>
-              <SevBadge severity={d.signature_status === "SIGNED_VALID" ? "MINOR" : d.signature_status === "SIGNED_MODIFIED" ? "CRITICAL" : "MAJOR"} />
+              <SevBadge severity={["SIGNED_VALID", "NOT_APPLICABLE"].includes(d.signature_status) ? "MINOR" : ["SIGNED_MODIFIED", "SIGNED_INVALID"].includes(d.signature_status) ? "CRITICAL" : "MAJOR"} />
             </div>
           ))}
         </div>

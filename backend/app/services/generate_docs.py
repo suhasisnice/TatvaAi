@@ -1,24 +1,30 @@
 """Generates the synthetic demo documents (PDFs, photos, faculty CSV) for the
-three demo institutions. Lazy-but-real: plain reportlab text PDFs with
-"Label: Value" lines our own extractor reads back, plus a 'Digitally Signed
-By:' marker standing in for a real DSC (see DECISIONS: a full PKI/pyHanko
-signing pipeline was dropped to keep the demo buildable in one session --
-the integrity property it demonstrates, "any change after signing is
-detectable", is preserved via SHA-256 comparison with the issuer's
-registered hash instead).
+three demo institutions: reportlab text PDFs with "Label: Value" lines our own
+extractor reads back, each digitally signed with a real PDF signature (pyHanko)
+by a certificate from the throwaway test PKI in services/pki.py. The tampered
+land record is a genuine post-signing edit: an incremental update that rewrites
+the page content after the signature was applied.
 """
+import io
 import random
 from pathlib import Path
 
+from pyhanko.pdf_utils import generic
+from pyhanko.pdf_utils.incremental_writer import IncrementalPdfFileWriter
+from pyhanko.sign import signers
+
 from PIL import Image, ImageDraw
 from reportlab.pdfgen import canvas
+
+from app.services import pki
 
 DATA_DIR = Path(__file__).resolve().parent.parent.parent / "data" / "synthetic"
 
 
 def make_pdf(path: Path, lines: list[str], footer: str = "SYNTHETIC DOCUMENT FOR DEMO. Not a real certificate."):
     path.parent.mkdir(parents=True, exist_ok=True)
-    c = canvas.Canvas(str(path), pagesize=(612, 792))
+    buf = io.BytesIO()
+    c = canvas.Canvas(buf, pagesize=(612, 792), pageCompression=0)
     y = 740
     c.setFont("Helvetica-Bold", 14)
     c.drawString(60, y, lines[0])
@@ -30,6 +36,34 @@ def make_pdf(path: Path, lines: list[str], footer: str = "SYNTHETIC DOCUMENT FOR
     c.setFont("Helvetica-Oblique", 8)
     c.drawString(60, 40, footer)
     c.save()
+
+    signer_name = next((ln.split(":", 1)[1].strip() for ln in lines if ln.lower().startswith("digitally signed by:")), None)
+    if signer_name is None:
+        path.write_bytes(buf.getvalue())
+        return
+    out = io.BytesIO()
+    signers.sign_pdf(IncrementalPdfFileWriter(io.BytesIO(buf.getvalue())),
+                     signers.PdfSignatureMetadata(field_name="Signature1"),
+                     signer=pki.get_signer(signer_name), output=out)
+    path.write_bytes(out.getvalue())
+
+
+def tamper_after_signing(src: Path, dst: Path, replacements: dict[str, str], note_line: str | None = None):
+    """Edit an already-signed PDF with an incremental update (the way real
+    edits of signed PDFs work): the original signature stays intact but only
+    covers the earlier revision."""
+    w = IncrementalPdfFileWriter(io.BytesIO(src.read_bytes()))
+    page = w.root["/Pages"]["/Kids"][0].get_object()
+    data = page["/Contents"].get_object().data
+    for old, new in replacements.items():
+        data = data.replace(old.encode(), new.encode())
+    if note_line:
+        data += f"\nBT /F1 8 Tf 60 60 Td ({note_line}) Tj ET\n".encode()
+    page["/Contents"] = w.add_object(generic.StreamObject(stream_data=data))
+    w.update_container(page)
+    out = io.BytesIO()
+    w.write(out)
+    dst.write_bytes(out.getvalue())
 
 
 def make_photo(path: Path, color: tuple[int, int, int], label: str, seed: int = 0):
@@ -248,13 +282,8 @@ def generate_all():
         "Institution Name: Chandra Technical Campus (Synthetic)",
         "Survey No: SY-118/4B",
     ])
-    make_pdf(c / "land_document.pdf", [
-        "LAND OWNERSHIP DOCUMENT",
-        "Digitally Signed By: Tamil Nadu Land Authority",
-        "Institution Name: Chandra Technical Campus (Synthetic)",
-        "Survey No: SY-118/9C",
-        "Tampered-Field: survey_no",
-    ])
+    tamper_after_signing(land_original, c / "land_document.pdf",
+                         {"SY-118/4B": "SY-118/9C"}, note_line="Tampered-Field: survey_no")
 
     make_photo(c / "classroom_photo.jpg", (160, 90, 60), "Chandra - Classroom", seed=1003)
     make_duplicate_photo(a / "lab_photo.jpg", c / "lab_photo.jpg")
