@@ -24,6 +24,8 @@ class Institution(Base):
     footprint_estimate_m2 = Column(Float, nullable=True)
     approved_intake = Column(Integer, default=0)
     website_faculty_count = Column(Integer, nullable=True)
+    # Declared infrastructure / cadre figures from the online form (see engines.norm_flags).
+    infrastructure = Column(JSON, default=dict)
 
     users = relationship("User", back_populates="institution")
     applications = relationship("Application", back_populates="institution")

@@ -11,6 +11,7 @@ from app.deps import get_current_user, require_roles
 from app.models import Application, Document, User, Flag, Verification, FacultyRegistryEntry
 from app.schemas import ApplicationCreate, FlagDecisionIn, InspectionDecisionIn
 from app.services import extraction, pipeline, audit, scoring, alerts, report
+from app.services.categories import CATEGORIES, CATEGORY_META
 
 router = APIRouter(prefix="/api/v1/applications", tags=["applications"])
 
@@ -24,11 +25,18 @@ def _serialize_application(app: Application) -> dict:
     return {
         "id": app.id, "institution_id": app.institution_id, "institution_name": app.institution.name,
         "state": app.institution.state, "aicte_id": app.institution.aicte_id,
-        "category": app.category, "academic_year": app.academic_year, "status": app.status,
+        "category": app.category, "category_title": CATEGORY_META.get(app.category, {}).get("title", app.category),
+        "academic_year": app.academic_year, "status": app.status,
         "risk_tier": app.risk_tier, "risk_score": app.risk_score, "top_reasons": app.top_reasons or [],
         "submitted_at": app.submitted_at.isoformat() if app.submitted_at else None,
         "reopen_count": app.reopen_count,
     }
+
+
+@router.get("/categories")
+def list_categories(user: User = Depends(get_current_user)):
+    return [{"id": cid, "title": meta["title"], "document_count": len(CATEGORIES[cid])}
+            for cid, meta in CATEGORY_META.items()]
 
 
 @router.get("")
@@ -43,6 +51,8 @@ def list_applications(user: User = Depends(get_current_user), db: Session = Depe
 @router.post("")
 def create_application(body: ApplicationCreate, user: User = Depends(require_roles("institution")),
                         db: Session = Depends(get_db)):
+    if body.category not in CATEGORIES:
+        raise HTTPException(status_code=400, detail="Unknown application category")
     app_obj = Application(institution_id=user.institution_id, category=body.category,
                            academic_year=body.academic_year, status="DRAFT")
     db.add(app_obj)
@@ -67,6 +77,9 @@ def get_application(app_id: int, user: User = Depends(get_current_user), db: Ses
 
     return {
         **_serialize_application(app_obj),
+        "required_documents": [
+            {"doc_type": t, "severity": sev, "citation": cit} for t, sev, cit in CATEGORIES.get(app_obj.category, [])
+        ],
         "documents": [
             {"id": d.id, "doc_type": d.doc_type, "file_name": d.file_name,
              "signature_status": d.signature_status, "sha256": d.sha256[:12],

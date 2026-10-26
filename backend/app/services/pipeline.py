@@ -6,6 +6,7 @@ from sqlalchemy.orm import Session
 
 from app.models import Application, Document, Flag, Verification, IssuerRecord
 from app.services import engines, scoring, audit, alerts
+from app.services.categories import applies_norms
 
 
 def _phash(path: Path) -> imagehash.ImageHash | None:
@@ -62,18 +63,24 @@ def run_pipeline(db: Session, application: Application, actor: str = "system") -
 
     all_flags += engines.consistency_engine(application, documents, institution)
 
-    duplicate_info = None
-    photo_doc = next((d for d in documents if d.doc_type == "INFRA_PHOTO"), None)
-    if photo_doc:
-        duplicate_info = _find_duplicate_photo(db, photo_doc)
+    if applies_norms(application.category):
+        duplicate_info = None
+        photo_doc = next((d for d in documents if d.doc_type == "INFRA_PHOTO"), None)
+        if photo_doc:
+            duplicate_info = _find_duplicate_photo(db, photo_doc)
 
-    all_flags += engines.compliance_engine(application, documents, institution, duplicate_info)
+        all_flags += engines.compliance_engine(application, documents, institution, duplicate_info)
 
-    footprint_estimate = (institution.declared_built_up_m2 or 0) and getattr(institution, "footprint_estimate_m2", None)
-    if footprint_estimate:
-        bf = engines.built_up_area_flag(institution, footprint_estimate)
-        if bf:
-            all_flags.append(bf)
+        faculty_doc = next((d for d in documents if d.doc_type == "FACULTY_LIST"), None)
+        dup_count = len(faculty_doc.extracted_fields.get("_duplicate_faculty_ids", [])) if faculty_doc else 0
+        valid_faculty = max((institution.declared_faculty or 0) - dup_count, 0)
+        all_flags += engines.norm_flags(institution, valid_faculty)
+
+        footprint_estimate = (institution.declared_built_up_m2 or 0) and getattr(institution, "footprint_estimate_m2", None)
+        if footprint_estimate:
+            bf = engines.built_up_area_flag(institution, footprint_estimate)
+            if bf:
+                all_flags.append(bf)
 
     # --- upsert flags by fingerprint, preserving officer decisions ---
     existing = {f.fingerprint: f for f in db.query(Flag).filter(Flag.application_id == application.id).all()}

@@ -4,11 +4,6 @@ import { Upload, PlayCircle, Send, CheckCircle2, FileText } from "lucide-react";
 import { api } from "../../lib/api";
 import { TierBadge } from "../../components/Badges";
 
-const REQUIRED_DOCS = [
-  "AFFIDAVIT_2", "TER_RECEIPT", "OCCUPANCY_CERTIFICATE", "FIRE_SAFETY_CERTIFICATE",
-  "SATELLITE_MAP", "AUDITED_ACCOUNTS", "FACULTY_LIST", "INFRA_PHOTO",
-];
-
 export default function ApplicationDetail() {
   const { id } = useParams();
   const [app, setApp] = useState<any>(null);
@@ -64,7 +59,6 @@ export default function ApplicationDetail() {
 
   if (!app) return <div className="card">Loading...</div>;
 
-  const uploadedTypes = new Set(app.documents.map((d: any) => d.doc_type));
   const locked = app.status !== "DRAFT";
 
   return (
@@ -72,14 +66,15 @@ export default function ApplicationDetail() {
       <div className="card" style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
         <div>
           <h2 style={{ margin: 0 }}>{app.institution_name}</h2>
-          <p className="muted small" style={{ margin: "4px 0 0" }}>{app.category} &middot; AY {app.academic_year} &middot; Status: {app.status}</p>
+          <p className="muted small" style={{ margin: "4px 0 0" }}>{app.category_title} &middot; AY {app.academic_year} &middot; Status: {app.status}</p>
         </div>
         {app.status !== "DRAFT" && <TierBadge tier={app.risk_tier} />}
       </div>
 
       <div className="card">
         <h2>Documents</h2>
-        {REQUIRED_DOCS.map(docType => {
+        {app.required_documents.map((req: any) => {
+          const docType = req.doc_type;
           const doc = app.documents.find((d: any) => d.doc_type === docType);
           return (
             <div className="doc-row" key={docType}>
