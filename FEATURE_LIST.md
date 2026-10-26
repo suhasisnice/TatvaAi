@@ -1,9 +1,9 @@
-# PramaanAI: feature list in simple words
+# TatvaAI: feature list in simple words
 
 ## What the project does
 Every year, colleges ask AICTE to renew their approval. They upload documents like fire safety and land certificates. Officers check them by hand, which is slow, and fake or expired papers can slip through.
 
-PramaanAI reads those documents, checks them, and warns the officer about problems. It shows proof for every warning. It gives each college a risk colour: GREEN (no risk), AMBER (medium risk) or RED (high risk). It also makes a list of which colleges inspectors should visit first.
+TatvaAI reads those documents, checks them, and warns the officer about problems. It shows proof for every warning. It gives each college a risk colour: GREEN (no risk), AMBER (medium risk) or RED (high risk). It also makes a list of which colleges inspectors should visit first.
 
 **The software never approves or rejects anyone. A human officer decides, and must write a reason.**
 
@@ -63,7 +63,7 @@ Every warning has a plain message, the proof it is based on, and the Handbook cl
 | Feature | What it means | Status |
 |---|---|---|
 | Review queue | All colleges, highest risk first | Done |
-| Review page | Summary, warnings with proof, verification, rules, map | Data fake, screens to build |
+| Review page | Summary, warnings with proof, verification, rules, map | Done |
 | Show the proof | Opens the document page with the exact spot highlighted | Done |
 | Accept or dismiss | Officer decides each warning and must write a reason; there is no reject button | Done |
 | Alerts | Missing info, expiring documents, suspicious findings | Done |

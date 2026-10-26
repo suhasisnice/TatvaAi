@@ -1,4 +1,4 @@
-# PramaanAI evaluation (synthetic ground truth)
+# TatvaAI evaluation (synthetic ground truth)
 
 Generated 2026-10-23 14:18 UTC by `scripts/evaluate.py` on freshly generated data (seed 2026), rule pack v1, in-process mock issuers.
 All numbers are measured on **synthetic** documents with known templates; they show the pipeline works end to end, not real-world accuracy.

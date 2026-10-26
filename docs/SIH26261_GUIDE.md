@@ -1,10 +1,10 @@
 > **Update 2026-10-26: the `admin` role was removed.** There are three roles (institution, officer, inspector). Rule packs, the audit log and reopen-once are officer duties; user management is gone. The inspector also records on-site Confirmed/Cleared verdicts per flagged item. Wherever this guide says "admin" read "officer".
 
-# PramaanAI and SIH26261: the complete team guide
+# TatvaAI and SIH26261: the complete team guide
 
 **Team Hexaminds · Smart India Hackathon 2026 · Problem statement SIH26261 (AICTE, Regulation Bureau)**
 
-This guide explains everything about the problem statement, the rules behind it (the AICTE Approval Process Handbook), and how our prototype PramaanAI solves it. It is written so that a teammate who has never opened the code can present the project, run the demo and answer judges' questions.
+This guide explains everything about the problem statement, the rules behind it (the AICTE Approval Process Handbook), and how our prototype TatvaAI solves it. It is written so that a teammate who has never opened the code can present the project, run the demo and answer judges' questions.
 
 | | |
 |---|---|
@@ -26,7 +26,7 @@ This guide explains everything about the problem statement, the rules behind it 
 2. [Smart India Hackathon and problem statement SIH26261](#2-smart-india-hackathon-and-problem-statement-sih26261)
 3. [The regulatory world: AICTE and the Approval Process Handbook](#3-the-regulatory-world-aicte-and-the-approval-process-handbook)
 4. [Glossary A to Z](#4-glossary-a-to-z)
-5. [PramaanAI at a glance](#5-pramaanai-at-a-glance)
+5. [TatvaAI at a glance](#5-tatvaai-at-a-glance)
 6. [Architecture and the processing pipeline](#6-architecture-and-the-processing-pipeline)
 7. [The five engines and every flag they raise](#7-the-five-engines-and-every-flag-they-raise)
 8. [Verification statuses, proof levels and carry-forward](#8-verification-statuses-proof-levels-and-carry-forward)
@@ -70,7 +70,7 @@ Conventions used below:
 
 **The problem.** Every AICTE-approved technical institution (engineering, management, pharmacy, design and similar colleges) must apply online every year to continue running its courses. This yearly renewal is the **Extension of Approval (EoA)**. For a plain EoA, the Handbook lets AICTE grant approval on the institution's **self-disclosure**: the college uploads seven documents and a sworn **Affidavit 2**, and there is no scrutiny committee and no inspection by default (APH Table 2.3, p.30). Inspections (the **Expert Visit Committee**, EVC) are picked **at random** (Clause 2.3.5 (a), p.15). Officers check documents by hand, and the same documents are checked again every year. Expired certificates, inconsistent numbers, edited documents and "ghost" faculty can slip through.
 
-**Our answer.** PramaanAI ("pramaan" = proof) checks what the institution discloses, before a human decides:
+**Our answer.** TatvaAI ("tatva" = essence, the underlying truth) checks what the institution discloses, before a human decides:
 
 1. It reads every uploaded document, finds each field and remembers exactly where it is on the page.
 2. It verifies documents with the original issuer (e-stamp, DigiLocker, ICAI, state fire and building portals, AICTE records), all mocked in the prototype.
@@ -79,7 +79,7 @@ Conventions used below:
 5. It turns findings into a **risk tier** (GREEN = no risk, AMBER = medium risk, RED = high risk) and a **ranked inspection list**, so inspectors go where they are most needed instead of at random.
 6. Every finding points to its evidence (document, page, highlighted box, or source system), cites the Handbook clause, and is decided by an officer with a written reason. Everything is written to a tamper-evident audit log.
 
-**One line for judges:** *PramaanAI turns AICTE's self-disclosure into verified disclosure, and points inspectors at the institutions most likely to need them.*
+**One line for judges:** *TatvaAI turns AICTE's self-disclosure into verified disclosure, and points inspectors at the institutions most likely to need them.*
 
 **Proof it works (synthetic data, measured by `scripts/verify_planted.py` and `scripts/evaluate.py`):**
 
@@ -153,11 +153,11 @@ The portal entry is long. Its content, in our own words and in the original orde
 
 **Five essential safeguards.** (1) All checks configurable to match the APH and regulations; (2) authorised, role-based access to records and sources, with no bypassing of access controls; (3) protection of institutional and personal data through security, access logging and retention safeguards; (4) explainable, evidence-backed AI flags; (5) AI is decision support only; statutory scrutiny, inspections and final decisions stay with competent authorities.
 
-### 2.5 How PramaanAI answers every line (traceability matrix)
+### 2.5 How TatvaAI answers every line (traceability matrix)
 
 Use this table when a judge says "the statement asks for X; where is it?"
 
-| Statement item | What PramaanAI does | Where to show it |
+| Statement item | What TatvaAI does | Where to show it |
 |---|---|---|
 | Objective 1: missing / incomplete / expired / inconsistent | Completeness engine (missing documents and fields, unsigned documents, expiry on submission and on academic-year start, provisional OC limit) and Consistency engine (names, trust, survey number, signatory, dates) | Institution pre-check fix-list; officer *Flags & Evidence* tab |
 | Objective 2: reuse records, avoid repeated checks | **Verify once, reuse every year**: a document whose SHA-256 matches one verified last year is carried forward as VERIFIED without re-verification; AICTE records (intake, built-up area, faculty count, campus, TER, provisional-OC history) are pulled from the (mock) AICTE records source | *Verification* tab ("carried forward from 2026-27"); A's land and occupancy certificates |
@@ -178,7 +178,7 @@ Use this table when a judge says "the statement asks for X; where is it?"
 
 ### 2.6 The five pain points and the feature that removes each
 
-| Pain point named in the statement | Why it happens today | PramaanAI feature |
+| Pain point named in the statement | Why it happens today | TatvaAI feature |
 |---|---|---|
 | Missing or expired documents | Officers read every upload by hand; validity dates are easy to miss | Completeness rules generated from the category checklist; expiry checked both at submission and on the academic-year start date; nightly alerts 60 days before expiry |
 | Inconsistent information | The same fact (name, survey number, built-up area, faculty count) appears in many places | Consistency engine compares documents with each other, with the online form, with last year's application, with AICTE records and with the institution's own website |
@@ -202,7 +202,7 @@ This section explains the rules that create our problem. You do not need to memo
   - **Section 10(k):** grant approval for new institutions and for new courses or programmes.
   - **Section 10(n):** prevent commercialisation of technical education.
   - **Section 10(p) and Section 11(1)-(4):** inspect, or cause to inspect, any technical institution; tell the institution the inspection date; share the results and the action to be taken; the institution reports back what it will do.
-- **Why this matters for us:** PramaanAI supports the Council's own duties of appraisal (10(g)), enforcing norms (10(i)) and inspection (10(p), 11). It does not replace any of them.
+- **Why this matters for us:** TatvaAI supports the Council's own duties of appraisal (10(g)), enforcing norms (10(i)) and inspection (10(p), 11). It does not replace any of them.
 
 ### 3.2 The Approval Process Handbook (APH)
 
@@ -318,7 +318,7 @@ Details worth knowing:
 | **Standing Appellate Committee (SAC)** | Hears appeals and assesses compliance of deficiencies observed by the SHC |
 | **Standing Complaint Scrutiny Committee (SCSC)** | Processes complaints against institutions (chaired by a retired High Court judge) |
 
-PramaanAI mostly helps the **Regulation Bureau** and **Scrutiny-style officers** (our `officer` role) and the **EVC** (our `inspector` role).
+TatvaAI mostly helps the **Regulation Bureau** and **Scrutiny-style officers** (our `officer` role) and the **EVC** (our `inspector` role).
 
 ### 3.8 Three-year EoA (Extended EoA)
 
@@ -344,7 +344,7 @@ Even with extended EoA, the institution must submit its data every year during t
 
 Annexure-2, section 2.1 lists what an existing institution uploads for **EoA on self-disclosure** (also for EoA after a break and restoration of intake). Supporting documents and affidavits are authenticated by the Chairman/Secretary of the Trust/Society/Company for self-financing institutions. Every document must carry a DSC (Clause 2.3.4 (a), p.15).
 
-| # | Document | What it is, in plain words | How PramaanAI checks it |
+| # | Document | What it is, in plain words | How TatvaAI checks it |
 |---|---|---|---|
 | (i) | **Affidavit 2** with the digital signature of the Trust's Chairman/Secretary, on Rs 100 e-stamp paper, sworn before a First Class Judicial Magistrate, Notary or Oath Commissioner | The institution's sworn promise that everything in the application is true (contents in the table below) | Present and signed; e-stamp value is Rs 100; e-stamp certificate verified with SHCIL (mock); e-stamp issued on or before the notarisation date; signatory matches the form |
 | (ii) | Copy of the **pay receipt** printed from the AICTE portal for the EoA year | Proof that TER was paid | Present and signed; receipt number and amount verified against AICTE payment records (mock) |
@@ -358,13 +358,13 @@ Prototype additions (not in Annexure-2, but needed for the checks in the brief a
 
 - **Faculty list (CSV).** The Handbook requires faculty data on the portal and its truth is declared in Affidavit 2 (Clause 6.14 (c), p.55; Affidavit 2 items 9, 17, 27, pp.186-187).
 - **Infrastructure photos** with GPS. The Handbook's EVC process already asks for video of all facilities with GPS coordinates at the entrance of the main building (Clause 1.9 (f)-(g) and note, p.8).
-- **Land document** (optional). Land documents are not in the EoA list (the 2024-27 edition reduced land-document compliance, Foreword p.ii); they are required for new institutions (Annexure-1, 1.1 (xii), p.77) and change of site. If an institution uploads one, PramaanAI still verifies it.
+- **Land document** (optional). Land documents are not in the EoA list (the 2024-27 edition reduced land-document compliance, Foreword p.ii); they are required for new institutions (Annexure-1, 1.1 (xii), p.77) and change of site. If an institution uploads one, TatvaAI still verifies it.
 
 **Increase in intake (Annexure-2, 2.6, p.82)** additionally needs **Affidavit 8** on Rs 100 stamp paper (not for extended EoA) and a **Trust resolution in Format 3** approving the extra courses or divisions and allocating land, building and funds. Affidavit 8 (p.194) declares that the Trust resolved to apply, paid TER, and has created the extra infrastructure, hostel and faculty.
 
 **Change in the name of the institution (Annexure-2, 2.10, p.83)** needs an **NOC from the affiliating university in Format 2**, or a receipt with the university's official seal proving the documents were submitted to it, and a **Trust resolution in Format 3**. Name rules: a private institution cannot use a name whose abbreviation looks like IIT, IIM, NIT and similar, or words such as "Government", "India", "National" (Clause 1.5.4, p.5; Clause 6.41, p.59); names must not copy another institution in the state (Clause 1.5.5, p.5); the full name must use the same font and size everywhere (Clause 1.5.6, p.5).
 
-**What Affidavit 2 actually promises (Affidavit-2 format, pp.186-188).** The deponent is the Chairperson/Secretary of the Trust/Society/Company. Among its 33 declarations, these are the ones PramaanAI tests:
+**What Affidavit 2 actually promises (Affidavit-2 format, pp.186-188).** The deponent is the Chairperson/Secretary of the Trust/Society/Company. Among its 33 declarations, these are the ones TatvaAI tests:
 
 | Affidavit 2 declaration (paraphrased) | Our check |
 |---|---|
@@ -424,7 +424,7 @@ Prototype additions (not in Annexure-2, but needed for the checks in the brief a
 
 Every institution must publish **mandatory disclosures** in its brochure and on its website. Annexure-18 (p.180) states that **the onus of authenticity lies with the institution only, not AICTE**. The list includes the name and address of the institution and Trust; governance committees; programmes approved and NBA-accredited; **course-wise faculty list and the permanent faculty-student ratio** (18.7, p.181); seats sanctioned and students admitted in each of the last three years (18.10, p.182); the number and size of classrooms, tutorial rooms, laboratories and computer centres, the **fire and safety certificate**, a short infrastructure video (18.15, pp.183-184). Suppression or misrepresentation invites penal action; the complete disclosure must be one PDF whose link is entered on the AICTE portal, freely viewable by the public (p.184).
 
-**Why this matters:** the website is a second, public statement of the same facts. PramaanAI reads the (mock) disclosure page and flags `DISCLOSURE_MISMATCH` when it contradicts the application (Institution C shows 85 faculty on its website but declares 109).
+**Why this matters:** the website is a second, public statement of the same facts. TatvaAI reads the (mock) disclosure page and flags `DISCLOSURE_MISMATCH` when it contradicts the application (Institution C shows 85 faculty on its website but declares 109).
 
 ### 3.14 Penalties (Chapter VII, pp.70-74)
 
@@ -439,7 +439,7 @@ Every institution must publish **mandatory disclosures** in its brochure and on 
   - **(j)** not allowing the EVC, or not having an occupancy/completion certificate, building licence, Form D or barrier-free environment (p.72).
 - **Complaints (Clause 7.10, p.73):** handled by AICTE's public grievance cell and the Standing Complaint Scrutiny Committee, which can order a warning, show-cause notice or EVC; anonymous complaints are not processed.
 
-PramaanAI's findings are written so an officer can see which of these provisions might be engaged, but the software never applies a penalty.
+TatvaAI's findings are written so an officer can see which of these provisions might be engaged, but the software never applies a penalty.
 
 ### 3.15 Other provisions that shape our design
 
@@ -457,15 +457,15 @@ Our brief cites two pieces of public evidence that the risk is real: an NGO inve
 
 ## 4. Glossary A to Z
 
-Each entry says what the term means in plain words, then where it comes from in the Handbook (APH) or where it lives in PramaanAI. Regulatory, academic, document and technical terms are mixed in one alphabetical list so you can look anything up quickly.
+Each entry says what the term means in plain words, then where it comes from in the Handbook (APH) or where it lives in TatvaAI. Regulatory, academic, document and technical terms are mixed in one alphabetical list so you can look anything up quickly.
 
 ### A
 
-**Academic Year (AY).** The academic activities of a university, board or institution in one year: an odd semester followed by an even semester (APH Definition 1, p.viii). Applications are made for a specific AY. *In PramaanAI:* the AY under review is **2027-28**, starting **1 August 2027** (`academic_year_start` in the rule pack); last year's applications are **2026-27**.
+**Academic Year (AY).** The academic activities of a university, board or institution in one year: an odd semester followed by an even semester (APH Definition 1, p.viii). Applications are made for a specific AY. *In TatvaAI:* the AY under review is **2027-28**, starting **1 August 2027** (`academic_year_start` in the rule pack); last year's applications are **2026-27**.
 
 **Access and Circulation Area (ACA).** Corridors, staircases, lobbies and other common walkways; about 25% of the built-up area (Annexure-3, 3.2 (b), p.87; 3.4 note 3, p.91).
 
-**Adapter.** A small piece of code that talks to one outside system (for example SHCIL or DigiLocker) and turns its answer into a standard result. *In PramaanAI:* `backend/app/adapters/`; every adapter calls the MOCK issuers service and its base URL comes from configuration, so a real authorised API could be plugged in later.
+**Adapter.** A small piece of code that talks to one outside system (for example SHCIL or DigiLocker) and turns its answer into a standard result. *In TatvaAI:* `backend/app/adapters/`; every adapter calls the MOCK issuers service and its base URL comes from configuration, so a real authorised API could be plugged in later.
 
 **Adjunct faculty / Professor of Practice.** Industry experts or visiting staff who may make up to 15% of the required faculty in most programmes (Clause 6.14 (d), p.55). Not counted as regular full-time faculty in our checks.
 
@@ -473,19 +473,19 @@ Each entry says what the term means in plain words, then where it comes from in 
 
 **Affidavit 1.** For a forgotten portal password (p.185).
 
-**Affidavit 2.** The main sworn declaration for Chapter I/II/IV applications: the Chairperson/Secretary of the Trust declares that everything submitted is true, that the institution is at the approved location, that occupancy, structural stability and fire certificates are uploaded, that faculty norms are met, that land and built-up area details are true, and accepts withdrawal of approval if anything is false (format pp.186-188). Sworn on Rs 100 non-judicial or e-stamp paper before a First Class Judicial Magistrate, Notary or Oath Commissioner, digitally signed and uploaded (Clause 2.3.4 (b), p.15; Annexure-2, 2.1 (i), p.81). *In PramaanAI:* document type `AFFIDAVIT_2`; checks for signature, Rs 100 value, e-stamp verification, e-stamp date before notarisation date, signatory consistency.
+**Affidavit 2.** The main sworn declaration for Chapter I/II/IV applications: the Chairperson/Secretary of the Trust declares that everything submitted is true, that the institution is at the approved location, that occupancy, structural stability and fire certificates are uploaded, that faculty norms are met, that land and built-up area details are true, and accepts withdrawal of approval if anything is false (format pp.186-188). Sworn on Rs 100 non-judicial or e-stamp paper before a First Class Judicial Magistrate, Notary or Oath Commissioner, digitally signed and uploaded (Clause 2.3.4 (b), p.15; Annexure-2, 2.1 (i), p.81). *In TatvaAI:* document type `AFFIDAVIT_2`; checks for signature, Rs 100 value, e-stamp verification, e-stamp date before notarisation date, signatory consistency.
 
-**Affidavit 8.** For an additional course or increase in intake: the Trust resolved to apply, paid TER, and created the extra infrastructure and faculty (p.194; required by Annexure-2, 2.6 (i), p.82). *In PramaanAI:* required document `AFFIDAVIT_8` in the `INCREASE_IN_INTAKE` category (the classifier does not yet recognise it; see section 16).
+**Affidavit 8.** For an additional course or increase in intake: the Trust resolved to apply, paid TER, and created the extra infrastructure and faculty (p.194; required by Annexure-2, 2.6 (i), p.82). *In TatvaAI:* required document `AFFIDAVIT_8` in the `INCREASE_IN_INTAKE` category (the classifier does not yet recognise it; see section 16).
 
 **Affiliating University / Board.** The university (or state technical board for diplomas) whose degree or diploma the institution's students receive. Its NOC (Format 2) is needed for several changes.
 
 **AICTE.** All India Council for Technical Education, the statutory regulator of technical education in India (AICTE Act 1987). See section 3.1.
 
-**AICTE portal.** The web portal (www.aicte-india.org) where institutions apply, pay TER, upload documents and download approval letters (Definition 6, p.viii). PramaanAI is designed to sit beside it.
+**AICTE portal.** The web portal (www.aicte-india.org) where institutions apply, pay TER, upload documents and download approval letters (Definition 6, p.viii). TatvaAI is designed to sit beside it.
 
 **AICTE records (mock).** Our simulated AICTE database for each institution: last EoA, approved intake by course and year, built-up area, faculty count, campus coordinates, TER payments, deficiency history and provisional-occupancy history. *Endpoint:* `/aicte/records/{institution_id}` on the mock service.
 
-**Alembic.** The tool that creates and upgrades database tables step by step ("migrations"). *In PramaanAI:* `backend/alembic/versions/0001` to `0005`.
+**Alembic.** The tool that creates and upgrades database tables step by step ("migrations"). *In TatvaAI:* `backend/alembic/versions/0001` to `0005`.
 
 **Alert.** An in-app notification shown under the bell icon. Kinds: `MISSING_INFO`, `DOC_EXPIRING`, `DOC_EXPIRED`, `PENDING_VERIFICATION`, `ANOMALY`. Created by the pipeline and by a nightly job (expiry within 60 days; pending verifications older than 7 days).
 
@@ -493,7 +493,7 @@ Each entry says what the term means in plain words, then where it comes from in 
 
 **Annexure.** An attachment section of the APH with detailed lists and tables. The ones we use most: Annexure-2 (EoA documents, p.81), Annexure-3 (land and built-up area norms, p.86), Annexure-4 (computers, internet, library, p.92), Annexure-5 (faculty, p.95), Annexure-14 (competent authorities, p.163), Annexure-16 (committees, p.176), Annexure-18 (mandatory disclosures, p.180).
 
-**API (Application Programming Interface).** A set of web addresses ("endpoints") that programs call to read or change data. *In PramaanAI:* 10 routers under `/api/v1`, documented automatically at `/docs`.
+**API (Application Programming Interface).** A set of web addresses ("endpoints") that programs call to read or change data. *In TatvaAI:* 10 routers under `/api/v1`, documented automatically at `/docs`.
 
 **Applicant.** Whoever applies to the Council for any approval (Definition 7, p.viii). For EoA this is the institution, represented by its Trust.
 
@@ -501,11 +501,11 @@ Each entry says what the term means in plain words, then where it comes from in 
 
 **APH (Approval Process Handbook).** The AICTE handbook of norms and procedures for all approvals, a legal document under the AICTE Act (Definition 8, p.viii). This guide uses the 2024-25 to 2026-27 edition.
 
-**Audit log (hash-chained).** A list of every important action (logins, uploads, engine runs, verification calls, decisions, rule-pack changes, reports) where each entry stores the fingerprint (hash) of the previous one. Changing or deleting any entry breaks the chain from that point. *In PramaanAI:* `audit_log` table, `GET /api/v1/audit/verify`, *Admin → Audit log*.
+**Audit log (hash-chained).** A list of every important action (logins, uploads, engine runs, verification calls, decisions, rule-pack changes, reports) where each entry stores the fingerprint (hash) of the previous one. Changing or deleting any entry breaks the chain from that point. *In TatvaAI:* `audit_log` table, `GET /api/v1/audit/verify`, *Admin → Audit log*.
 
 **Audited statement of accounts.** The Trust/Society/Company's financial statements for the previous year, audited by a chartered accountant (Annexure-2, 2.1 (vii), p.81). *Document type:* `AUDITED_ACCOUNTS`; verified by UDIN.
 
-**Authenticity engine.** The PramaanAI engine that checks whether a document is genuine: cryptographic proof first (signature, modification after signing, QR), forensic hints second (fonts, metadata, ELA). Section 7.2.
+**Authenticity engine.** The TatvaAI engine that checks whether a document is genuine: cryptographic proof first (signature, modification after signing, QR), forensic hints second (fonts, metadata, ELA). Section 7.2.
 
 ### B
 
@@ -513,13 +513,13 @@ Each entry says what the term means in plain words, then where it comes from in 
 
 **BoG / BoM.** Board of Governors / Board of Management of an institution; recommended composition in Annexure-17 (p.179).
 
-**Bounding box (bbox).** The rectangle on a page that contains a piece of text, stored as four numbers x0, y0, x1, y1. *In PramaanAI:* normalised to 0-1 (fractions of page width and height) so it can be drawn at any zoom; the evidence viewer draws it in red.
+**Bounding box (bbox).** The rectangle on a page that contains a piece of text, stored as four numbers x0, y0, x1, y1. *In TatvaAI:* normalised to 0-1 (fractions of page width and height) so it can be drawn at any zoom; the evidence viewer draws it in red.
 
 **Break in EoA.** When an institution did not obtain EoA on its own in a previous year (Definition 14, p.viii). Applications after a break go through scrutiny and EVC; after six years without applying, the institution must apply as new (Clause 2.16.1, p.24).
 
 **Building Licence.** One of the documents accepted in place of an occupancy/completion certificate (Clause 6.17 (g), p.57).
 
-**Built-up area.** The total floor area of the buildings: instructional, administrative and amenities carpet areas plus about 25% for circulation (Annexure-3, 3.2, p.87). *In PramaanAI:* the declared total is compared with the building footprints × floors from the (mock) geo dataset; more than 15% difference raises `BUILTUP_AREA_IMPLAUSIBLE`.
+**Built-up area.** The total floor area of the buildings: instructional, administrative and amenities carpet areas plus about 25% for circulation (Annexure-3, 3.2, p.87). *In TatvaAI:* the declared total is compared with the building footprints × floors from the (mock) geo dataset; more than 15% difference raises `BUILTUP_AREA_IMPLAUSIBLE`.
 
 ### C
 
@@ -533,27 +533,27 @@ Each entry says what the term means in plain words, then where it comes from in 
 
 **Celery, worker, beat.** A job system for running work in the background. The worker runs jobs (for example a pre-check when `USE_CELERY=true`); "beat" is the scheduler that starts the nightly alert job at 02:00.
 
-**Certificate Authority (CA).** An organisation that issues digital certificates and vouches for who owns a signing key. *In PramaanAI:* a **test** CA ("PramaanAI Test Root CA (Synthetic)") created by `scripts/make_test_pki.py`; real DSCs are issued by licensed CAs in India.
+**Certificate Authority (CA).** An organisation that issues digital certificates and vouches for who owns a signing key. *In TatvaAI:* a **test** CA ("TatvaAI Test Root CA (Synthetic)") created by `scripts/make_test_pki.py`; real DSCs are issued by licensed CAs in India.
 
 **Chartered Accountant (CA, accounting).** A member of the Institute of Chartered Accountants of India (ICAI) who audits accounts and generates a UDIN for each certificate.
 
 **Citation.** The Handbook source of a rule: document, clause and printed page (for example "APH 2024-27, Annexure-5, p.95"). Every rule in our rule pack carries one, and it is shown on every rule-based flag.
 
-**Classification (document classification).** Deciding what kind of document an upload is (affidavit, fire certificate, and so on). *In PramaanAI:* keyword rules on the title and text; photos are `INFRA_PHOTO`, CSV files are `FACULTY_LIST`; unknown files are `UNKNOWN`.
+**Classification (document classification).** Deciding what kind of document an upload is (affidavit, fire certificate, and so on). *In TatvaAI:* keyword rules on the title and text; photos are `INFRA_PHOTO`, CSV files are `FACULTY_LIST`; unknown files are `UNKNOWN`.
 
 **Competent Authority.** The government body legally empowered to issue a certificate or make a decision. For land and buildings, state-wise lists are in Annexure-14 (pp.163-169). For admission, see Definition 20 (p.viii). For reopening a submitted application, the AICTE competent authority (Clause 2.3.3 (e), p.14).
 
-**Completeness engine.** The PramaanAI engine that checks required documents and fields, signatures, expiry and the provisional-occupancy limit. Section 7.3.
+**Completeness engine.** The TatvaAI engine that checks required documents and fields, signatures, expiry and the provisional-occupancy limit. Section 7.3.
 
 **Completion Certificate (CC).** A certificate from the local authority that construction finished according to the approved plan. Often used interchangeably with occupancy certificate (Clause 6.17 (g), p.57). The 30-year structural-stability rule counts from its issue (Clause 6.17 (h), p.57).
 
-**Compliance engine.** The PramaanAI engine that evaluates numeric Handbook norms (faculty, rooms, labs, PCs, bandwidth) and infrastructure evidence (photos, footprints, imagery). Section 7.5.
+**Compliance engine.** The TatvaAI engine that evaluates numeric Handbook norms (faculty, rooms, labs, PCs, bandwidth) and infrastructure evidence (photos, footprints, imagery). Section 7.5.
 
 **Compliance Report.** The institution's reply showing how it has fixed deficiencies found by the EVC or listed in a show-cause notice or speaking order (Definition 21, p.viii).
 
 **Confidence.** A number from 0 to 1 that says how sure an automated check is. Forensic flags are weighted by their confidence in the risk score.
 
-**Consistency engine.** The PramaanAI engine that compares facts across documents, years, institutions and the public website, and checks that dates are in a possible order. Section 7.4.
+**Consistency engine.** The TatvaAI engine that compares facts across documents, years, institutions and the public website, and checks that dates are in a possible order. Section 7.4.
 
 **Contractual faculty.** Temporary faculty, allowed only for short periods in extraordinary circumstances (Clause 6.14 (e), p.56).
 
@@ -577,9 +577,9 @@ Each entry says what the term means in plain words, then where it comes from in 
 
 **Deterministic.** Producing exactly the same output every time from the same input. Our synthetic data generator is deterministic: every file has the same SHA-256 on every run (fixed seed 2026, fixed dates, test keys derived from the seed).
 
-**DigiLocker.** The Government of India's digital document wallet, where issuers publish documents that citizens and organisations can share. *In PramaanAI:* a mock DigiLocker holds the original land record; C's edited survey number does not match it (`ISSUER_MISMATCH`).
+**DigiLocker.** The Government of India's digital document wallet, where issuers publish documents that citizens and organisations can share. *In TatvaAI:* a mock DigiLocker holds the original land record; C's edited survey number does not match it (`ISSUER_MISMATCH`).
 
-**Digital signature / DSC (Digital Signature Certificate).** A cryptographic seal on a PDF made with a private key; anyone can check it with the signer's certificate. If even one byte of the signed content changes, the signature no longer validates. All APH documents must be uploaded DSC-signed (Clause 1.4.3, p.4; Clause 2.3.4 (a), p.15). *In PramaanAI:* validated with pyHanko; statuses `SIGNED_VALID`, `SIGNED_MODIFIED`, `SIGNED_INVALID`, `SIGNED_UNTRUSTED`, `UNSIGNED`.
+**Digital signature / DSC (Digital Signature Certificate).** A cryptographic seal on a PDF made with a private key; anyone can check it with the signer's certificate. If even one byte of the signed content changes, the signature no longer validates. All APH documents must be uploaded DSC-signed (Clause 1.4.3, p.4; Clause 2.3.4 (a), p.15). *In TatvaAI:* validated with pyHanko; statuses `SIGNED_VALID`, `SIGNED_MODIFIED`, `SIGNED_INVALID`, `SIGNED_UNTRUSTED`, `UNSIGNED`.
 
 **Division.** A batch of seats. For diploma and UG Engineering, a division is at most **60 or 30** seats; PG Engineering 30; MCA and PG Management 60; integrated degrees 60 (Definition 26, p.ix). Divisions drive classroom counts and EoA TER charges.
 
@@ -593,9 +593,9 @@ Each entry says what the term means in plain words, then where it comes from in 
 
 **e-stamp / Non-judicial stamp paper.** Stamp duty paid electronically (e-stamp) or on printed stamp paper, used for affidavits and agreements. Affidavit 2 must be on Rs 100 paper (Clause 2.3.4 (b), p.15). Each e-stamp certificate has a unique number, issue date, state and value that SHCIL can confirm.
 
-**Edit lock.** After final submission, the application cannot be edited (Clause 2.3.3 (c), p.14). PramaanAI enforces this: uploads and edits return HTTP 409 once locked.
+**Edit lock.** After final submission, the application cannot be edited (Clause 2.3.3 (c), p.14). TatvaAI enforces this: uploads and edits return HTTP 409 once locked.
 
-**ELA (Error Level Analysis).** An image-forensics technique: re-save an image as JPEG and look at how much each area changes. Areas edited separately can stand out. Crisp printed text is bright everywhere, so in PramaanAI the ELA heatmap is shown to officers as evidence but never raises a flag on its own.
+**ELA (Error Level Analysis).** An image-forensics technique: re-save an image as JPEG and look at how much each area changes. Areas edited separately can stand out. Crisp printed text is bright everywhere, so in TatvaAI the ELA heatmap is shown to officers as evidence but never raises a flag on its own.
 
 **Engine.** One of our five checking modules: issuer verification, authenticity, completeness, consistency, compliance (with infrastructure evidence).
 
@@ -611,9 +611,9 @@ Each entry says what the term means in plain words, then where it comes from in 
 
 **Executive Committee (EC).** AICTE's committee under Section 12 of the Act that decides approvals; its decisions are ratified by the Council (Definition 28, p.ix; Clause 2.25 (a), p.31).
 
-**EXIF.** Information a camera stores inside a photo: date and time, GPS latitude and longitude, camera model, software. *In PramaanAI:* read from every photo; GPS far from the campus raises `PHOTO_GPS_OFFSITE`; editing software in the EXIF raises `METADATA_ANOMALY`. EXIF can be edited, so these are preliminary indicators.
+**EXIF.** Information a camera stores inside a photo: date and time, GPS latitude and longitude, camera model, software. *In TatvaAI:* read from every photo; GPS far from the campus raises `PHOTO_GPS_OFFSITE`; editing software in the EXIF raises `METADATA_ANOMALY`. EXIF can be edited, so these are preliminary indicators.
 
-**Expiry.** The "valid till" date on a certificate. *In PramaanAI:* checked against the submission date (`DOC_EXPIRED`) and against the academic-year start date (`DOC_EXPIRES_BEFORE_AY`).
+**Expiry.** The "valid till" date on a certificate. *In TatvaAI:* checked against the submission date (`DOC_EXPIRED`) and against the academic-year start date (`DOC_EXPIRES_BEFORE_AY`).
 
 ### F
 
@@ -639,7 +639,7 @@ Each entry says what the term means in plain words, then where it comes from in 
 
 **Flag.** A finding raised by an engine: a code, a severity, a confidence, a message, an explanation, evidence, and (for rule-based flags) the rule id, rule-pack version and citation. A flag is never a decision.
 
-**Footprint (building footprint).** The outline of a building on the ground, as seen from above (from maps or satellite data). Footprint area × number of floors estimates the built-up area. *In PramaanAI:* mock GeoJSON at `/geo/footprints/{campus_id}`, with each building's area, floors and the year it first appears in imagery.
+**Footprint (building footprint).** The outline of a building on the ground, as seen from above (from maps or satellite data). Footprint area × number of floors estimates the built-up area. *In TatvaAI:* mock GeoJSON at `/geo/footprints/{campus_id}`, with each building's area, floors and the year it first appears in imagery.
 
 **Forensics / forensic indicator.** Checks that look for signs of editing without cryptographic proof: font inconsistency, metadata anomalies, ELA, photo GPS/time, photo reuse, imagery timing. Always labelled **"Preliminary indicator — requires human verification"** and weighted by confidence.
 
@@ -655,19 +655,19 @@ Each entry says what the term means in plain words, then where it comes from in 
 
 **GPS / latitude and longitude.** Position on Earth in degrees. The satellite map must show the latitude and longitude of the main building entrance (Annexure-2, 2.1 (vi), p.81).
 
-**GREEN / AMBER / RED.** PramaanAI's risk tiers: **GREEN = no risk** (fast-track, officer confirms), **AMBER = medium risk** (fix-list to the institution), **RED = high risk** (ranked inspection list). Always shown with the text label.
+**GREEN / AMBER / RED.** TatvaAI's risk tiers: **GREEN = no risk** (fast-track, officer confirms), **AMBER = medium risk** (fix-list to the institution), **RED = high risk** (ranked inspection list). Always shown with the text label.
 
 ### H
 
 **Hamming distance.** The number of bits that differ between two fingerprints. Used to compare perceptual hashes of photos (out of 64 bits).
 
-**Hash / SHA-256.** A fixed-length fingerprint of a file or text. Any change to the input changes the hash completely. *In PramaanAI:* every upload gets a SHA-256 (used for carry-forward and duplicate detection); every audit entry stores hashes.
+**Hash / SHA-256.** A fixed-length fingerprint of a file or text. Any change to the input changes the hash completely. *In TatvaAI:* every upload gets a SHA-256 (used for carry-forward and duplicate detection); every audit entry stores hashes.
 
 **Hibernation.** Approval kept in abeyance with the Council's permission while an institution restructures (Definition 14, p.viii; Clause 2.16.1 (d), p.24).
 
 ### I
 
-**ICAI / UDIN.** The Institute of Chartered Accountants of India issues a **Unique Document Identification Number (UDIN)** for every certificate a chartered accountant signs, so anyone can check that the certificate is genuine. *In PramaanAI:* mock endpoint `/udin/verify`.
+**ICAI / UDIN.** The Institute of Chartered Accountants of India issues a **Unique Document Identification Number (UDIN)** for every certificate a chartered accountant signs, so anyone can check that the certificate is genuine. *In TatvaAI:* mock endpoint `/udin/verify`.
 
 **Increase in intake.** An application to add seats or courses; needs scrutiny and EVC (Table 2.3, p.30), Affidavit 8 and a Format 3 resolution (Annexure-2, 2.6, p.82). Category `INCREASE_IN_INTAKE`.
 
@@ -681,11 +681,11 @@ Each entry says what the term means in plain words, then where it comes from in 
 
 **Issuer / issuing authority.** The body that issued a document (SHCIL for e-stamps, the fire department for fire NOC, the local authority for occupancy, ICAI for UDIN, DigiLocker for issued records).
 
-**Issuer verification engine.** The PramaanAI engine that asks each issuing source to confirm a document and records one of six statuses. Section 7.1.
+**Issuer verification engine.** The TatvaAI engine that asks each issuing source to confirm a document and records one of six statuses. Section 7.1.
 
 ### J
 
-**JWT (JSON Web Token).** A signed login token. *In PramaanAI:* access tokens last 15 minutes and refresh tokens 7 days.
+**JWT (JSON Web Token).** A signed login token. *In TatvaAI:* access tokens last 15 minutes and refresh tokens 7 days.
 
 **Jobs table.** Records background jobs such as pre-checks (status PENDING, RUNNING, DONE, FAILED, and the result).
 
@@ -745,7 +745,7 @@ Each entry says what the term means in plain words, then where it comes from in 
 
 **PaddleOCR / LayoutLMv3 / YOLOv8 / Ollama.** Optional AI models: OCR, layout-aware extraction, object detection (counting PCs in lab photos), and a local large language model for drafting rules. Off by default (feature flags).
 
-**Perceptual hash (pHash).** A 64-bit fingerprint of what an image looks like, so that resized, cropped or recompressed copies still have nearly the same hash. *In PramaanAI:* blurred pHash compared across several centre crops; a distance of 8 or less out of 64 means "near copy" (C's copied lab photo scores 2).
+**Perceptual hash (pHash).** A 64-bit fingerprint of what an image looks like, so that resized, cropped or recompressed copies still have nearly the same hash. *In TatvaAI:* blurred pHash compared across several centre crops; a distance of 8 or less out of 64 means "near copy" (C's copied lab photo scores 2).
 
 **PKI (Public Key Infrastructure).** The system of keys, certificates and certificate authorities behind digital signatures.
 
@@ -773,7 +773,7 @@ Each entry says what the term means in plain words, then where it comes from in 
 
 **Regulation Bureau.** The AICTE bureau that handles approvals: it schedules scrutiny, places the consolidated approval list before the Executive Committee and gives observations to the appellate committee (Clauses 1.8 (b), 2.24 (d), 2.25 (a)). The department behind SIH26261.
 
-**Reopen once.** A submitted application can be reopened only one time, with the competent authority's approval (Clause 2.3.3 (e), p.14). *In PramaanAI:* `POST /applications/{id}/reopen`, admin only, refused the second time.
+**Reopen once.** A submitted application can be reopened only one time, with the competent authority's approval (Clause 2.3.3 (e), p.14). *In TatvaAI:* `POST /applications/{id}/reopen`, admin only, refused the second time.
 
 **Risk score.** The sum of the weights of all non-dismissed flags (forensic flags multiplied by their confidence).
 
@@ -807,7 +807,7 @@ Each entry says what the term means in plain words, then where it comes from in 
 
 **Severity.** How serious a flag is: CRITICAL, MAJOR, MINOR, INFO.
 
-**SHCIL.** Stock Holding Corporation of India Limited, the central record-keeper for e-stamp certificates. *In PramaanAI:* mock endpoint `/shcil/verify`.
+**SHCIL.** Stock Holding Corporation of India Limited, the central record-keeper for e-stamp certificates. *In TatvaAI:* mock endpoint `/shcil/verify`.
 
 **simpleeval.** A safe calculator for rule formulas: it can evaluate expressions such as `ceil(S / 20)` but cannot run arbitrary code. We never use Python's `eval`.
 
@@ -855,7 +855,7 @@ Each entry says what the term means in plain words, then where it comes from in 
 
 ---
 
-## 5. PramaanAI at a glance
+## 5. TatvaAI at a glance
 
 ### 5.1 Principles (say these out loud in the pitch)
 
@@ -868,14 +868,14 @@ Each entry says what the term means in plain words, then where it comes from in 
 
 ### 5.2 Who uses it
 
-| Role | Who in real life | What they do in PramaanAI | Login (demo) |
+| Role | Who in real life | What they do in TatvaAI | Login (demo) |
 |---|---|---|---|
-| `institution` | The college, acting for its Trust | Fill and correct the form, upload documents, run **pre-check**, read the fix-list, **submit** (which locks the application) | `inst-a@pramaan.test`, `inst-b@…`, `inst-c@…` |
-| `officer` | Regulation Bureau scrutiny officer | Review the risk-sorted queue; open the workbench; read each flag with its evidence; **accept or dismiss with a reason**; record **manual verification** when a source is down; download the validation report | `officer@pramaan.test` |
-| `inspector` | EVC member | See the **ranked inspection list** with reasons and an on-site checklist; export it as PDF | `inspector@pramaan.test` |
-| `admin` | Regulation Bureau administrator | Manage **rule packs** (edit YAML, validate, dry-run, activate); verify and export the **audit log**; manage users; **reopen** a submitted application once | `admin@pramaan.test` |
+| `institution` | The college, acting for its Trust | Fill and correct the form, upload documents, run **pre-check**, read the fix-list, **submit** (which locks the application) | `inst-a@tatva.test`, `inst-b@…`, `inst-c@…` |
+| `officer` | Regulation Bureau scrutiny officer | Review the risk-sorted queue; open the workbench; read each flag with its evidence; **accept or dismiss with a reason**; record **manual verification** when a source is down; download the validation report | `officer@tatva.test` |
+| `inspector` | EVC member | See the **ranked inspection list** with reasons and an on-site checklist; export it as PDF | `inspector@tatva.test` |
+| `admin` | Regulation Bureau administrator | Manage **rule packs** (edit YAML, validate, dry-run, activate); verify and export the **audit log**; manage users; **reopen** a submitted application once | `admin@tatva.test` |
 
-All demo passwords are `Pramaan@2026`. These accounts exist only in your local database.
+All demo passwords are `Tatva@2026`. These accounts exist only in your local database.
 
 ### 5.3 What the system produces
 
@@ -965,7 +965,7 @@ If no title matches, body keywords decide with lower confidence (0.6 instead of 
 
 **Field extraction** (`services/extraction/fields.py`). Every text span on the page is collected with its font and box. A span ending in ":" is a label; spans to its right on the same line form the value. The label is mapped to a field name (for example "E-Stamp Issue Date" → `estamp_issue_date`, "Survey No" → `survey_no`). The value's box is converted to fractions of the page (0-1), so the viewer can draw it at any size. Text-layer fields get confidence 0.99; OCR fields 0.85.
 
-**Signature inspection** (`services/extraction/signature.py`). For each embedded signature: who signed (certificate subject), when (signer-reported time), whether the signed bytes are intact, whether the signature is mathematically valid, whether the certificate chains to the trusted test CA, how much of the file it covers (`ENTIRE_FILE` or only an earlier revision), and the modification level of later changes. Result per document: `UNSIGNED`, `SIGNED_VALID`, `SIGNED_MODIFIED`, `SIGNED_INVALID` or `SIGNED_UNTRUSTED`. The function `signed_revision()` can cut the file back to exactly what was signed, which is how PramaanAI shows *what* changed after signing.
+**Signature inspection** (`services/extraction/signature.py`). For each embedded signature: who signed (certificate subject), when (signer-reported time), whether the signed bytes are intact, whether the signature is mathematically valid, whether the certificate chains to the trusted test CA, how much of the file it covers (`ENTIRE_FILE` or only an earlier revision), and the modification level of later changes. Result per document: `UNSIGNED`, `SIGNED_VALID`, `SIGNED_MODIFIED`, `SIGNED_INVALID` or `SIGNED_UNTRUSTED`. The function `signed_revision()` can cut the file back to exactly what was signed, which is how TatvaAI shows *what* changed after signing.
 
 **Photos** (`services/extraction/media.py`). EXIF GPS is converted from degrees-minutes-seconds to decimal degrees; capture time, camera make/model and software are kept; a perceptual hash is stored.
 
@@ -1065,7 +1065,7 @@ Numbers are compared as numbers; text is compared after normalisation (case, pun
 | Code | Severity | Raised when | Example |
 |---|---|---|---|
 | `SIGNATURE_INVALID` | CRITICAL (broken signature) or MAJOR (signer not trusted by the CA) | The signature does not validate, the signed bytes were altered, or the signing certificate does not chain to a trusted CA | Not planted; covered by tests |
-| `MODIFIED_AFTER_SIGNING` | CRITICAL | The signature only covers an earlier revision and a later revision changed the content. PramaanAI cuts the file back to the signed revision, re-reads it and compares every field, so the flag says exactly what changed and highlights that field | C's land record: "survey_no was SY-118/4B when signed, now SY-118/9C", signed 2026-01-10 |
+| `MODIFIED_AFTER_SIGNING` | CRITICAL | The signature only covers an earlier revision and a later revision changed the content. TatvaAI cuts the file back to the signed revision, re-reads it and compares every field, so the flag says exactly what changed and highlights that field | C's land record: "survey_no was SY-118/4B when signed, now SY-118/9C", signed 2026-01-10 |
 | `QR_MISMATCH` | MAJOR | The QR payload on an occupancy or fire certificate disagrees with the printed field (certificate number, type, issue date, valid-till) | C's fire certificate: QR says valid till 2026-12-31, printed text says 2028-12-31 |
 
 **Step 2, forensic indicators** (always preliminary, weighted by confidence):
@@ -1132,7 +1132,7 @@ Normalisation means "AURORA INSTITUTE OF TECHNOLOGY (SYNTHETIC)" and "Aurora Ins
 | `DUPLICATE_DOCUMENT_CROSS_INSTITUTION` | MAJOR (later) / INFO (earlier) | Another institution uploaded a byte-identical file, or the same certificate number, e-stamp number, receipt number, UDIN or registration number | Not planted |
 | `DUPLICATE_PHOTO` | MAJOR (later) / INFO (earlier), forensic, confidence = 1 − distance/64 | A photo is a near-copy of another institution's photo: blurred perceptual hash compared across several centre crops, distance 8 or less out of 64 | **C's lab_1.jpg is A's lab photo, cropped and recompressed (distance 2, confidence 0.97); A gets an INFO notice** |
 
-**(e) Public disclosure, flag `DISCLOSURE_MISMATCH` (MAJOR).** PramaanAI reads the institution's mandatory-disclosure page (Annexure-18, p.180) and compares total intake, faculty count and accreditation with the application. The address comes from configuration plus the institution's slug, never from a link typed in the form (so an applicant cannot point the checker at a page they control). **C's website lists 85 faculty; the application declares 109.** If the page cannot be read: `ISSUER_UNAVAILABLE` (INFO).
+**(e) Public disclosure, flag `DISCLOSURE_MISMATCH` (MAJOR).** TatvaAI reads the institution's mandatory-disclosure page (Annexure-18, p.180) and compares total intake, faculty count and accreditation with the application. The address comes from configuration plus the institution's slug, never from a link typed in the form (so an applicant cannot point the checker at a page they control). **C's website lists 85 faculty; the application declares 109.** If the page cannot be read: `ISSUER_UNAVAILABLE` (INFO).
 
 ### 7.5 Compliance engine (`compliance.py`) and infrastructure evidence (`infrastructure.py`)
 
@@ -1164,7 +1164,7 @@ Normalisation means "AURORA INSTITUTE OF TECHNOLOGY (SYNTHETIC)" and "Aurora Ins
 
 ### 8.1 The six statuses
 
-Every question PramaanAI asks an issuing source ends in exactly one of these six answers (code: `backend/app/services/engines/common.py`, `issuer.py`).
+Every question TatvaAI asks an issuing source ends in exactly one of these six answers (code: `backend/app/services/engines/common.py`, `issuer.py`).
 
 | Status | Plain meaning | When it happens | What the officer does | Example in our data |
 |---|---|---|---|---|
@@ -1218,7 +1218,7 @@ The satellite map is always CRYPTOGRAPHIC because there is no issuing authority 
 
 ### 8.5 Verify once, reuse every year (carry-forward)
 
-Most EoA documents do not change from one year to the next: the land record, the occupancy certificates, often the structural certificate. Today they are re-uploaded and re-read every year. PramaanAI's rule (`backend/app/services/evidence/carry_forward.py`):
+Most EoA documents do not change from one year to the next: the land record, the occupancy certificates, often the structural certificate. Today they are re-uploaded and re-read every year. TatvaAI's rule (`backend/app/services/evidence/carry_forward.py`):
 
 1. Before any engine runs, take each uploaded document's **SHA-256** (its exact fingerprint).
 2. Look for a document with the same SHA-256 in an **earlier application of the same institution** that has a `VERIFIED` check.
@@ -1350,7 +1350,7 @@ This is the heart of the answer to Clause 2.3.5 (a), p.15 ("institutions at rand
 
 ### 10.1 Why the rules live in YAML
 
-The APH changes every cycle (it is revised and re-issued; the current one covers 2024-27). If norms were written in Python, every change would need a developer and a new release, and nobody could say which rule produced which result. In PramaanAI:
+The APH changes every cycle (it is revised and re-issued; the current one covers 2024-27). If norms were written in Python, every change would need a developer and a new release, and nobody could say which rule produced which result. In TatvaAI:
 
 - Every Handbook requirement we check is a **rule** in a YAML file, with the **clause and printed page** it comes from.
 - Rules are grouped into a versioned **rule pack** (`APH-2024-27`, version `v1`). Exactly one pack is active.
@@ -1665,7 +1665,7 @@ The issuer engine compares the receipt's number and amount with the (mock) AICTE
 
 `scripts/make_test_pki.py` creates a small public-key infrastructure that exists only for testing:
 
-- a root certificate authority, "PramaanAI Test Root CA (Synthetic)";
+- a root certificate authority, "TatvaAI Test Root CA (Synthetic)";
 - eight signer certificates: `inst-a`, `inst-b`, `inst-c` (the institutions' DSCs), `auth-karnataka`, `auth-maharashtra`, `auth-tamilnadu` (state authorities), `ca-firm` (the chartered accountant) and `aicte-portal` (TER receipts).
 
 The RSA-2048 keys are generated from a **seeded** prime generator, so every run produces identical keys, certificates and signatures. That also means they are **not secure**, and nothing real trusts this CA; the backend is configured to trust only it (`TRUST_ROOT_PATH`). The signatures are genuine PDF signatures (made with pyHanko), so the authenticity engine checks them exactly as it would check a real DSC.
@@ -1686,7 +1686,7 @@ Why it matters: tests can compare exact hashes, the evaluation is repeatable, ca
 1. The land record is rendered (all values in Helvetica) and DSC-signed by the Tamil Nadu authority on 2026-01-10. The DigiLocker mock stores the original's fields and SHA-256.
 2. Then a **second revision is appended** to the same PDF (an "incremental update"): the survey number is blacked out and "SY-118/9C" is written in its place in Times-Roman.
 
-This is how real edits of signed PDFs work: the signature still exists and still validates, but it only covers the first revision. PramaanAI notices because pyHanko reports what the signature covers; it then cuts the file back to the signed revision, reads it again, and names the field that changed. The font mismatch and the DigiLocker mismatch corroborate it.
+This is how real edits of signed PDFs work: the signature still exists and still validates, but it only covers the first revision. TatvaAI notices because pyHanko reports what the signature covers; it then cuts the file back to the signed revision, reads it again, and names the field that changed. The font mismatch and the DigiLocker mismatch corroborate it.
 
 ### 11.11 The mock issuers (all MOCK)
 
@@ -1857,13 +1857,13 @@ The design follows the principles of India's **Digital Personal Data Protection 
 
 - Seed a fresh database: `docker compose exec backend python scripts/seed.py --reset` (or `make seed`). Seeding leaves B's 2027-28 application as an editable **draft** so the pre-check and submit can be shown live; A and C are already submitted.
 - Submitting B live gives the same result on any real date from 13 September 2026 to the end of 2029: **AMBER, score 30**, with only the two findings the pre-check showed (the synthetic photos are dated 11 to 13 September 2026, so they never look newer than the submission; `DECISIONS.md` item 58).
-- Use two browser windows (or a normal and a private window): one for `inst-b@pramaan.test`, one for the officer and then the admin. Password for all demo users: `Pramaan@2026`.
+- Use two browser windows (or a normal and a private window): one for `inst-b@tatva.test`, one for the officer and then the admin. Password for all demo users: `Tatva@2026`.
 - Keep a terminal open in the project folder for the audit tamper step.
 - If you activated `v2-demo` during a rehearsal, re-seed: activation stays in force for every later validation.
 
 | Time | Screen | Do | Say |
 |---|---|---|---|
-| 0:00 | (title slide or login page) | — | "Plain Extension of Approval is granted on self-disclosure: Table 2.3 of the Handbook (p.30) has no scrutiny and no expert visit for it, and Clause 2.3.5 (p.15) sends inspectors to institutions at random. PramaanAI turns self-disclosure into verified disclosure and replaces random inspection with a ranked list. It never approves or rejects; an officer decides." |
+| 0:00 | (title slide or login page) | — | "Plain Extension of Approval is granted on self-disclosure: Table 2.3 of the Handbook (p.30) has no scrutiny and no expert visit for it, and Clause 2.3.5 (p.15) sends inspectors to institutions at random. TatvaAI turns self-disclosure into verified disclosure and replaces random inspection with a ranked list. It never approves or rejects; an officer decides." |
 | 0:30 | Institution B → *My applications* → AY 2027-28 draft | **Run pre-check** | "Before submitting, the institution sees a plain-language fix-list with the Handbook reference: the fire certificate runs out on 30 June 2027, before the academic year starts on 1 August (Annexure-2 (v), p.81), and the provisional occupancy certificate is in its third year (Annexure-3, 3.1 (c), p.86). Two items need no action: the Maharashtra occupancy portal has no API, so an officer will confirm them." |
 | 1:00 | Same page | **Submit application** → read the confirmation → OK | "Submitting locks editing, as the Handbook requires (Clause 2.3.3, p.14); the Regulation Bureau can reopen it once." |
 | 1:15 | Officer → *Review queue* | Point at the KPI cards and charts | "C is RED, high risk; B AMBER, medium risk; A GREEN, no risk. Sorted by evidence, not by arrival." |
@@ -2028,14 +2028,14 @@ $env:MOCK_ISSUERS_URL = "http://127.0.0.1:9000"; $env:TRUST_ROOT_PATH = "$PWD\da
 cd frontend; npm install; npm run dev
 ```
 
-### 17.3 Demo users (synthetic; password `Pramaan@2026`)
+### 17.3 Demo users (synthetic; password `Tatva@2026`)
 
 | Role | Email |
 |---|---|
-| Institution A, B, C | `inst-a@pramaan.test`, `inst-b@pramaan.test`, `inst-c@pramaan.test` |
-| Officer | `officer@pramaan.test` |
-| Inspector | `inspector@pramaan.test` |
-| Admin | `admin@pramaan.test` |
+| Institution A, B, C | `inst-a@tatva.test`, `inst-b@tatva.test`, `inst-c@tatva.test` |
+| Officer | `officer@tatva.test` |
+| Inspector | `inspector@tatva.test` |
+| Admin | `admin@tatva.test` |
 
 ### 17.4 Tests and checks
 
@@ -2147,7 +2147,7 @@ Annexure-2, 2.1 (iii) (p.81) refers to "Clause 7.17" for the occupancy certifica
 
 ## Appendix B: APH digest (everything relevant we found)
 
-Paraphrased, in page order. "Use" says where PramaanAI relies on it.
+Paraphrased, in page order. "Use" says where TatvaAI relies on it.
 
 | Clause | Page | What it says | Use |
 |---|---|---|---|
@@ -2204,7 +2204,7 @@ Paraphrased, in page order. "Use" says where PramaanAI relies on it.
 ## Appendix C: repository map
 
 ```
-pramaanai/
+tatvaai/
 ├─ backend/
 │  ├─ app/
 │  │  ├─ main.py                 FastAPI app; mounts the 10 routers under /api/v1

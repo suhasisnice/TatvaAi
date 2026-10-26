@@ -130,7 +130,7 @@ def test_carry_forward_only_unchanged_verified_documents(world):
 
 
 def test_rulepack_api_last(world, client, login):
-    off = login("officer@pramaan.test")
+    off = login("officer@tatva.test")
     assert client.get("/api/v1/rulepacks", headers=off).status_code == 200
     r = client.post("/api/v1/rulepacks", json={"from_dir": "APH-2024-27-v1"}, headers=off)
     assert r.status_code == 201 and r.json()["status"] == "draft"

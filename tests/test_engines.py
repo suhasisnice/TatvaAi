@@ -191,7 +191,7 @@ def test_rerun_is_idempotent_and_keeps_decisions(world):
 
 def test_verify_api_and_ela_endpoint_last(world, client, login):
     # `client` resets the DB; this only checks roles on the new endpoints
-    inst, off = login("inst-a@pramaan.test"), login("officer@pramaan.test")
+    inst, off = login("inst-a@tatva.test"), login("officer@tatva.test")
     assert client.post("/api/v1/applications/1/verify", headers=inst).status_code == 403
     assert client.post("/api/v1/applications/999/verify", headers=off).status_code == 404
     assert client.get("/api/v1/applications/999/verifications", headers=off).status_code == 404

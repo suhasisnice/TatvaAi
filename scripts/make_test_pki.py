@@ -68,7 +68,7 @@ def det_rsa_key(seed: str, bits: int = 2048) -> rsa.RSAPrivateKey:
 
 def _name(cn: str) -> x509.Name:
     return x509.Name([
-        x509.NameAttribute(NameOID.ORGANIZATION_NAME, "PramaanAI Test PKI (Synthetic)"),
+        x509.NameAttribute(NameOID.ORGANIZATION_NAME, "TatvaAI Test PKI (Synthetic)"),
         x509.NameAttribute(NameOID.COMMON_NAME, cn),
     ])
 
@@ -81,8 +81,8 @@ def ensure_pki(outdir: Path, force: bool = False) -> Path:
     outdir.mkdir(parents=True, exist_ok=True)
     if not force and (outdir / "ca.pem").exists() and all((outdir / f"{s}.pem").exists() for s in SIGNERS):
         return outdir
-    ca_key = det_rsa_key("pramaan-test-ca")
-    ca_subject = _name("PramaanAI Test Root CA (Synthetic)")
+    ca_key = det_rsa_key("tatva-test-ca")
+    ca_subject = _name("TatvaAI Test Root CA (Synthetic)")
     ca_cert = (
         x509.CertificateBuilder().subject_name(ca_subject).issuer_name(ca_subject)
         .public_key(ca_key.public_key()).serial_number(1000)
@@ -94,7 +94,7 @@ def ensure_pki(outdir: Path, force: bool = False) -> Path:
     )
     (outdir / "ca.pem").write_bytes(ca_cert.public_bytes(serialization.Encoding.PEM))
     for i, s in enumerate(SIGNERS):
-        k = det_rsa_key(f"pramaan-test-{s}")
+        k = det_rsa_key(f"tatva-test-{s}")
         cert = (
             x509.CertificateBuilder().subject_name(_name(f"DSC {s} (Synthetic)")).issuer_name(ca_subject)
             .public_key(k.public_key()).serial_number(2000 + i)

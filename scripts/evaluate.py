@@ -77,7 +77,7 @@ with w["db_factory"]() as db:
 out = Path(args.out)
 out.parent.mkdir(parents=True, exist_ok=True)
 rows = "\n".join(f"| {t} | {a} | {b} | {c} | {prf(a, b, c)[0]:.3f} | {prf(a, b, c)[1]:.3f} |" for t, (a, b, c) in sorted(per_type.items()))
-out.write_text(f"""# PramaanAI evaluation (synthetic ground truth)
+out.write_text(f"""# TatvaAI evaluation (synthetic ground truth)
 
 Generated {datetime.now(timezone.utc):%Y-%m-%d %H:%M UTC} by `scripts/evaluate.py` on freshly generated data (seed 2026), rule pack v1, in-process mock issuers.
 All numbers are measured on **synthetic** documents with known templates; they show the pipeline works end to end, not real-world accuracy.

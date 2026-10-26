@@ -40,7 +40,7 @@ export default function Workbench({ user }: { user: User }) {
           <RiskChip tier={a.risk?.tier} score={a.risk?.score} />
           <div className="row gap">
             <button onClick={rerun} disabled={!!busy}><RefreshCw size={15} aria-hidden /> {busy ? "Validating…" : "Re-run validation"}</button>
-            <button onClick={() => download(`/applications/${id}/report.pdf`, `pramaanai-report-${id}.pdf`).catch((e) => setErr(e.message))}><FileDown size={15} aria-hidden /> Validation report (PDF)</button>
+            <button onClick={() => download(`/applications/${id}/report.pdf`, `tatvaai-report-${id}.pdf`).catch((e) => setErr(e.message))}><FileDown size={15} aria-hidden /> Validation report (PDF)</button>
           </div>
         </div>
       </div>

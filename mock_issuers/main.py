@@ -9,7 +9,7 @@ from fastapi import FastAPI, HTTPException
 from fastapi.responses import HTMLResponse, JSONResponse
 
 DB_PATH = Path(os.environ.get("MOCK_DB", "/app/data/synthetic/mock_db.json"))
-app = FastAPI(title="PramaanAI mock issuers (MOCK)")
+app = FastAPI(title="TatvaAI mock issuers (MOCK)")
 _cache = {"mtime": None, "db": {}}
 
 

@@ -12,7 +12,7 @@ ROOT = Path(__file__).resolve().parents[1]
 
 def build_world(live_mock: str | None = None, keep_db: str | None = None) -> dict:
     """Returns dict(db_factory, apps, expected, manifest, data_dir, timings). Must be called before any `app.*` import."""
-    tmp = Path(tempfile.mkdtemp(prefix="pramaan-run-"))
+    tmp = Path(tempfile.mkdtemp(prefix="tatva-run-"))
     os.environ["DATABASE_URL"] = f"sqlite:///{Path(keep_db) if keep_db else tmp / 'run.db'}"
     os.environ["STORAGE_DIR"] = str(tmp / "storage")
     data = tmp / "synthetic"

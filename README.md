@@ -1,11 +1,11 @@
-# PramaanAI
+# TatvaAI
 
 **Smart India Hackathon 2026 · SIH26261 · AICTE (Regulation Bureau) · Team Hexaminds**
 *AI-Powered Application Validation, Document Authentication and Regulatory Compliance Verification*
 
-> PramaanAI turns AICTE's self-disclosure into verified disclosure, and points inspectors at the institutions most likely to need them.
+> TatvaAI turns AICTE's self-disclosure into verified disclosure, and points inspectors at the institutions most likely to need them.
 
-Plain Extension of Approval (EoA) is granted on an institution's **self-disclosure**: the Approval Process Handbook (APH) 2024-27, Table 2.3 (p. 30), shows no scrutiny committee or Expert Visit Committee for it, and inspections are picked **at random** (Clause 2.3.5, p. 15). PramaanAI checks what institutions disclose (documents, numbers, photos, faculty), shows officers *evidence-linked* findings, and replaces random selection with a **ranked, risk-targeted inspection list**.
+Plain Extension of Approval (EoA) is granted on an institution's **self-disclosure**: the Approval Process Handbook (APH) 2024-27, Table 2.3 (p. 30), shows no scrutiny committee or Expert Visit Committee for it, and inspections are picked **at random** (Clause 2.3.5, p. 15). TatvaAI checks what institutions disclose (documents, numbers, photos, faculty), shows officers *evidence-linked* findings, and replaces random selection with a **ranked, risk-targeted inspection list**.
 
 **Decision support only.** The system never approves, rejects or penalises. Every flag points to evidence (document + page + bounding box, or a source system); an officer accepts or dismisses it with a reason; everything is written to a hash-chained audit log.
 **All people, institutions and documents are synthetic, and every external source (SHCIL, DigiLocker, ICAI, state portals, AICTE records, geo data) is a clearly labelled MOCK.**
@@ -89,13 +89,13 @@ cd frontend; npm install; npm run dev
 
 Use `127.0.0.1`, not `localhost`, for `MOCK_ISSUERS_URL` on Windows (IPv6 fallback makes every call ~1 s slower).
 
-### Demo users (password `Pramaan@2026`, synthetic, stored only in your local DB)
+### Demo users (password `Tatva@2026`, synthetic, stored only in your local DB)
 
 | Role | Email |
 |---|---|
-| institution (A, B, C) | `inst-a@pramaan.test`, `inst-b@pramaan.test`, `inst-c@pramaan.test` |
-| officer | `officer@pramaan.test` |
-| inspector | `inspector@pramaan.test` |
+| institution (A, B, C) | `inst-a@tatva.test`, `inst-b@tatva.test`, `inst-c@tatva.test` |
+| officer | `officer@tatva.test` |
+| inspector | `inspector@tatva.test` |
 
 Officers can enable TOTP two-factor authentication under *Security* (set `MFA_REQUIRED=true` to nudge it).
 

@@ -16,8 +16,8 @@ def _minio():
     from minio import Minio  # only needed when STORAGE=minio
 
     c = Minio(settings.minio_endpoint, settings.minio_access_key, settings.minio_secret_key, secure=False)
-    if not c.bucket_exists("pramaan"):
-        c.make_bucket("pramaan")
+    if not c.bucket_exists("tatva"):
+        c.make_bucket("tatva")
     return c
 
 
@@ -27,7 +27,7 @@ def put(key: str, data: bytes) -> None:
     if settings.storage == "minio":
         import io
 
-        _minio().put_object("pramaan", key, io.BytesIO(data), len(data))
+        _minio().put_object("tatva", key, io.BytesIO(data), len(data))
         return
     p = Path(settings.storage_dir) / key
     p.parent.mkdir(parents=True, exist_ok=True)
@@ -36,7 +36,7 @@ def put(key: str, data: bytes) -> None:
 
 def get(key: str) -> bytes:
     if settings.storage == "minio":
-        r = _minio().get_object("pramaan", key)
+        r = _minio().get_object("tatva", key)
         data = r.read()
         r.close()
     else:

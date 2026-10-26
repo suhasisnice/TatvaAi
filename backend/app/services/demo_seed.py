@@ -4,7 +4,7 @@ from sqlalchemy.orm import Session
 from app.core.security import hash_password
 from app.models import Institution, User
 
-DEMO_PASSWORD = "Pramaan@2026"  # synthetic demo accounts only
+DEMO_PASSWORD = "Tatva@2026"  # synthetic demo accounts only
 INSTITUTIONS = [
     ("a", "Aurora Institute of Technology (Synthetic)", "Karnataka"),
     ("b", "Bhavani College of Engineering (Synthetic)", "Maharashtra"),
@@ -22,9 +22,9 @@ def seed_users(db: Session) -> list[tuple[str, str, str]]:
             inst = Institution(name=name, slug=f"inst-{key}", state=state, aicte_id=f"SYN-AICTE-{1001 + 'abc'.index(key)}")
             db.add(inst)
             db.flush()
-        rows.append(("institution", f"inst-{key}@pramaan.test", inst.id, name))
+        rows.append(("institution", f"inst-{key}@tatva.test", inst.id, name))
     for role, name in STAFF:
-        rows.append((role, f"{role}@pramaan.test", None, name))
+        rows.append((role, f"{role}@tatva.test", None, name))
     out = []
     for role, email, inst_id, name in rows:
         if not db.scalar(select(User).where(User.email == email)):

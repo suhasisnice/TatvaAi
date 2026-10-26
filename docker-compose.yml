@@ -6,7 +6,7 @@ x-backend: &backend
       INSTALL_ML: ${INSTALL_ML:-false}
   env_file: [.env.example]
   environment:
-    DATABASE_URL: postgresql+psycopg://pramaan:pramaan@db:5432/pramaan
+    DATABASE_URL: postgresql+psycopg://tatva:tatva@db:5432/tatva
     REDIS_URL: redis://redis:6379/0
     TRUST_ROOT_PATH: /app/data/synthetic/pki/ca.pem
     STORAGE_DIR: /app/storage
@@ -21,10 +21,10 @@ x-backend: &backend
 services:
   db:
     image: postgis/postgis:16-3.4
-    environment: { POSTGRES_USER: pramaan, POSTGRES_PASSWORD: pramaan, POSTGRES_DB: pramaan }
+    environment: { POSTGRES_USER: tatva, POSTGRES_PASSWORD: tatva, POSTGRES_DB: tatva }
     volumes: [pgdata:/var/lib/postgresql/data]
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U pramaan"]
+      test: ["CMD-SHELL", "pg_isready -U tatva"]
       interval: 5s
       retries: 10
   redis:

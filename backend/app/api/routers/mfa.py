@@ -22,7 +22,7 @@ def setup(user: User = Depends(current_user), db: Session = Depends(get_db)):
     user.mfa_secret = pyotp.random_base32()
     db.add(user)
     db.commit()
-    uri = pyotp.TOTP(user.mfa_secret).provisioning_uri(user.email, issuer_name="PramaanAI")
+    uri = pyotp.TOTP(user.mfa_secret).provisioning_uri(user.email, issuer_name="TatvaAI")
     buf = io.BytesIO()
     qrcode.make(uri).save(buf, format="PNG")
     return {"secret": user.mfa_secret, "uri": uri, "qr_png_base64": base64.b64encode(buf.getvalue()).decode()}

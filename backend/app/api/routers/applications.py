@@ -127,7 +127,7 @@ def report_pdf(app_id: int, user: User = Depends(require_roles("officer", "inspe
     pdf, digest = application_report(db, a)
     audit.log(db, user, "report.generate", f"application:{a.id}", {"application_id": a.id, "content_sha256": digest, "file_sha256": hashlib.sha256(pdf).hexdigest()})
     db.commit()
-    return Response(pdf, media_type="application/pdf", headers={"Content-Disposition": f"attachment; filename=pramaanai-report-{a.id}.pdf"})
+    return Response(pdf, media_type="application/pdf", headers={"Content-Disposition": f"attachment; filename=tatvaai-report-{a.id}.pdf"})
 
 
 STAFF = ("officer", "inspector")

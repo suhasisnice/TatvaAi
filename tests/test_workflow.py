@@ -10,7 +10,7 @@ from fastapi.testclient import TestClient
 from sqlalchemy import select
 
 ROOT = Path(__file__).resolve().parents[1]
-PW = "Pramaan@2026"
+PW = "Tatva@2026"
 AY = "2027-28"
 
 
@@ -54,18 +54,18 @@ def env(tmp_path_factory):
 
 
 def test_queue_is_sorted_by_risk_with_text_labels(env):
-    q = env["api"].get("/api/v1/risk/queue", headers=env["login"]("officer@pramaan.test")).json()
+    q = env["api"].get("/api/v1/risk/queue", headers=env["login"]("officer@tatva.test")).json()
     assert [(i["institution_name"][:5], i["tier"], i["tier_label"]) for i in q] == [("Chand", "RED", "High risk"), ("Bhava", "AMBER", "Medium risk"), ("Auror", "GREEN", "No risk")]
     assert q[0]["top_reason"] and q[0]["score"] > q[1]["score"] > q[2]["score"] == 0
-    assert len(env["api"].get("/api/v1/risk/queue?academic_year=all", headers=env["login"]("officer@pramaan.test")).json()) == 5
-    assert env["api"].get("/api/v1/risk/queue?tier=RED", headers=env["login"]("officer@pramaan.test")).json()[0]["tier"] == "RED"
-    assert env["api"].get("/api/v1/risk/queue", headers=env["login"]("inst-a@pramaan.test")).status_code == 403
-    stats = env["api"].get("/api/v1/risk/stats", headers=env["login"]("officer@pramaan.test")).json()
+    assert len(env["api"].get("/api/v1/risk/queue?academic_year=all", headers=env["login"]("officer@tatva.test")).json()) == 5
+    assert env["api"].get("/api/v1/risk/queue?tier=RED", headers=env["login"]("officer@tatva.test")).json()[0]["tier"] == "RED"
+    assert env["api"].get("/api/v1/risk/queue", headers=env["login"]("inst-a@tatva.test")).status_code == 403
+    stats = env["api"].get("/api/v1/risk/stats", headers=env["login"]("officer@tatva.test")).json()
     assert stats["by_tier"] == {"GREEN": 1, "AMBER": 1, "RED": 1}
 
 
 def test_tier_scoring_details(env):
-    h = env["login"]("officer@pramaan.test")
+    h = env["login"]("officer@tatva.test")
     a = env["api"].get(f"/api/v1/applications/{env['ids']['b', AY]}", headers=h).json()["risk"]
     assert a["tier"] == "AMBER" and a["score"] == 30 and a["routing"] == "FIX_LIST" and len(a["reasons"]) == 2 and a["rule_pack_version"] == "v1"
     c = env["api"].get(f"/api/v1/applications/{env['ids']['c', AY]}", headers=h).json()["risk"]
@@ -74,7 +74,7 @@ def test_tier_scoring_details(env):
 
 def test_flag_decision_requires_reason_and_keeps_flag(env):
     api, ids = env["api"], env["ids"]
-    off, insp = env["login"]("officer@pramaan.test"), env["login"]("inspector@pramaan.test")
+    off, insp = env["login"]("officer@tatva.test"), env["login"]("inspector@tatva.test")
     flags = api.get(f"/api/v1/flags?application_id={ids['c', AY]}", headers=off).json()
     target = next(f for f in flags if f["code"] == "DISCLOSURE_MISMATCH")
     assert target["evidence"] and target["status"] == "OPEN"
@@ -90,13 +90,13 @@ def test_flag_decision_requires_reason_and_keeps_flag(env):
 
 
 def test_manual_verification_of_unavailable_source(env):
-    api, ids, off = env["api"], env["ids"], env["login"]("officer@pramaan.test")
+    api, ids, off = env["api"], env["ids"], env["login"]("officer@tatva.test")
     vs = api.get(f"/api/v1/applications/{ids['a', AY]}/verifications", headers=off).json()
     fire = [v for v in vs if v["source"].startswith("Karnataka fire")]
     assert [v["status"] for v in fire] == ["SOURCE_UNAVAILABLE", "MANUAL_REVIEW_REQUIRED"] and all(v["mock"] for v in vs)
     manual = fire[1]["id"]
     assert api.post(f"/api/v1/verifications/{manual}/manual", json={"note": "x"}, headers=off).status_code == 422
-    assert api.post(f"/api/v1/verifications/{manual}/manual", json={"note": "Confirmed with the fire office by phone"}, headers=env["login"]("inst-a@pramaan.test")).status_code == 403
+    assert api.post(f"/api/v1/verifications/{manual}/manual", json={"note": "Confirmed with the fire office by phone"}, headers=env["login"]("inst-a@tatva.test")).status_code == 403
     r = api.post(f"/api/v1/verifications/{manual}/manual", json={"note": "Confirmed with the fire office by phone"}, headers=off)
     assert r.json()["status"] == "VERIFIED"
     assert api.post(f"/api/v1/verifications/{manual}/manual", json={"note": "Confirmed again later"}, headers=off).status_code == 409
@@ -104,7 +104,7 @@ def test_manual_verification_of_unavailable_source(env):
 
 def test_precheck_submit_lock_reopen_once(env):
     api, ids = env["api"], env["ids"]
-    b, off = env["login"]("inst-b@pramaan.test"), env["login"]("officer@pramaan.test")
+    b, off = env["login"]("inst-b@tatva.test"), env["login"]("officer@tatva.test")
     app_id = ids["b", AY]
     assert api.post(f"/api/v1/applications/{app_id}/precheck", headers=b).status_code == 409  # locked
     assert api.patch(f"/api/v1/applications/{app_id}", json={"form": {"signatory": {"name": "X"}}}, headers=b).status_code == 409
@@ -121,7 +121,7 @@ def test_precheck_submit_lock_reopen_once(env):
     assert "Annexure-2 (v)" in items["DOC_EXPIRES_BEFORE_AY"]["citation"] and "p. 81" in items["DOC_EXPIRES_BEFORE_AY"]["citation"]
     assert "Annexure-3, 3.1 (c)" in items["PROVISIONAL_OC_LIMIT_EXCEEDED"]["citation"] and "p. 86" in items["PROVISIONAL_OC_LIMIT_EXCEEDED"]["citation"] and items["DOC_EXPIRES_BEFORE_AY"]["how_to_fix"]
     assert job["fix_list"]["ready_to_submit"] is False and "risk" not in api.get(f"/api/v1/applications/{app_id}", headers=b).json()
-    assert api.get(f"/api/v1/precheck/jobs/{started.json()['job_id']}", headers=env["login"]("inst-a@pramaan.test")).status_code == 404
+    assert api.get(f"/api/v1/precheck/jobs/{started.json()['job_id']}", headers=env["login"]("inst-a@tatva.test")).status_code == 404
     # edit while unlocked, submit locks again, second reopen refused
     assert api.patch(f"/api/v1/applications/{app_id}", json={"form": {"signatory": {"name": "Edited Signatory"}}}, headers=b).json()["form_data"]["signatory"]["name"] == "Edited Signatory"
     s = api.post(f"/api/v1/applications/{app_id}/submit", headers=b).json()
@@ -134,7 +134,7 @@ def test_precheck_submit_lock_reopen_once(env):
 
 def test_upload_blocked_when_locked_and_allowed_when_open(env):
     api, ids = env["api"], env["ids"]
-    a = env["login"]("inst-a@pramaan.test")
+    a = env["login"]("inst-a@tatva.test")
     sample = (env["out"] / "a/2027-28/docs/TER_RECEIPT.pdf").read_bytes()
     assert api.post(f"/api/v1/applications/{ids['a', AY]}/documents", files={"file": ("t.pdf", sample, "application/pdf")}, headers=a).status_code == 409
     new = api.post("/api/v1/applications", json={"academic_year": "2028-29"}, headers=a).json()
@@ -143,8 +143,8 @@ def test_upload_blocked_when_locked_and_allowed_when_open(env):
 
 
 def test_inspection_list_and_pdfs(env):
-    api, ids, off = env["api"], env["ids"], env["login"]("officer@pramaan.test")
-    lst = api.get("/api/v1/risk/inspection-list", headers=env["login"]("inspector@pramaan.test")).json()
+    api, ids, off = env["api"], env["ids"], env["login"]("officer@tatva.test")
+    lst = api.get("/api/v1/risk/inspection-list", headers=env["login"]("inspector@tatva.test")).json()
     assert [i["institution_name"][:7] for i in lst] == ["Chandra"] and lst[0]["tier_label"] == "High risk" and lst[0]["rank"] == 1
     checks = {c["code"] for c in lst[0]["checklist"]}
     assert {"MODIFIED_AFTER_SIGNING", "DUPLICATE_PHOTO", "NORM_FACULTY_SHORTFALL"} <= checks
@@ -152,7 +152,7 @@ def test_inspection_list_and_pdfs(env):
     assert pdf.status_code == 200 and pdf.content.startswith(b"%PDF") and pdf.headers["content-type"] == "application/pdf"
     rep = api.get(f"/api/v1/applications/{ids['c', AY]}/report.pdf", headers=off)
     assert rep.status_code == 200 and rep.content.startswith(b"%PDF")
-    assert api.get(f"/api/v1/applications/{ids['c', AY]}/report.pdf", headers=env["login"]("inst-c@pramaan.test")).status_code == 403
+    assert api.get(f"/api/v1/applications/{ids['c', AY]}/report.pdf", headers=env["login"]("inst-c@tatva.test")).status_code == 403
     gen = api.get(f"/api/v1/audit?action=report.generate", headers=off).json()
     import hashlib
     assert gen[0]["payload"]["file_sha256"] == hashlib.sha256(rep.content).hexdigest() and len(gen[0]["payload"]["content_sha256"]) == 64
@@ -160,7 +160,7 @@ def test_inspection_list_and_pdfs(env):
 
 
 def test_inspector_on_site_verdicts_grouped_by_document(env):
-    api, insp, off = env["api"], env["login"]("inspector@pramaan.test"), env["login"]("officer@pramaan.test")
+    api, insp, off = env["api"], env["login"]("inspector@tatva.test"), env["login"]("officer@tatva.test")
     entry = api.get("/api/v1/risk/inspection-list", headers=insp).json()[0]
     groups = entry["document_groups"]
     assert any(g["document_type"] == "Land Document" for g in groups) and groups[-1]["document_id"] is None  # institution-wide last
@@ -194,7 +194,7 @@ def test_report_footer_contains_content_hash():
 
 def test_alerts(env):
     api, ids = env["api"], env["ids"]
-    off, c, b, a = env["login"]("officer@pramaan.test"), env["login"]("inst-c@pramaan.test"), env["login"]("inst-b@pramaan.test"), env["login"]("inst-a@pramaan.test")
+    off, c, b, a = env["login"]("officer@tatva.test"), env["login"]("inst-c@tatva.test"), env["login"]("inst-b@tatva.test"), env["login"]("inst-a@tatva.test")
     ao = api.get("/api/v1/alerts", headers=off).json()
     assert ao["unread_count"] >= 1 and any(x["kind"] == "ANOMALY" and x["application_id"] == ids["c", AY] for x in ao["alerts"])
     from app.core.db import SessionLocal
@@ -225,10 +225,10 @@ def test_retention_lists_without_deleting(env):
 
 
 def test_audit_chain_and_tamper_detection(env):
-    api, off = env["api"], env["login"]("officer@pramaan.test")
+    api, off = env["api"], env["login"]("officer@tatva.test")
     v = api.get("/api/v1/audit/verify", headers=off).json()
     assert v["intact"] and v["entries"] > 50
-    assert api.get("/api/v1/audit/verify", headers=env["login"]("inst-a@pramaan.test")).status_code == 403
+    assert api.get("/api/v1/audit/verify", headers=env["login"]("inst-a@tatva.test")).status_code == 403
     assert api.get("/api/v1/audit/export?format=csv", headers=off).text.startswith("seq,ts,actor")
     from app.core.db import SessionLocal
     from app.models import AuditLog
@@ -257,7 +257,7 @@ def test_audit_chain_and_tamper_detection(env):
 
 
 def test_dry_run_then_activate_keeps_old_results_last(env):
-    api, ids, off = env["api"], env["ids"], env["login"]("officer@pramaan.test")
+    api, ids, off = env["api"], env["ids"], env["login"]("officer@tatva.test")
     assert api.post("/api/v1/rulepacks", json={"from_dir": "APH-2024-27-v2-demo"}, headers=off).status_code == 201
     from app.core.db import SessionLocal
     from app.models import Flag, RuleResult

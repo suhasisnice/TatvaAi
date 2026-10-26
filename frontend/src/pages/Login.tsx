@@ -1,7 +1,7 @@
 import { FormEvent, useState } from "react";
 import { login, User } from "../api";
 
-const DEMO = ["inst-a", "inst-b", "inst-c", "officer", "inspector"].map((u) => `${u}@pramaan.test`);
+const DEMO = ["inst-a", "inst-b", "inst-c", "officer", "inspector"].map((u) => `${u}@tatva.test`);
 
 export default function Login({ onLogin }: { onLogin: (u: User) => void }) {
   const [email, setEmail] = useState("");
@@ -24,7 +24,7 @@ export default function Login({ onLogin }: { onLogin: (u: User) => void }) {
 
   return (
     <form className="card login" onSubmit={submit}>
-      <h1>PramaanAI</h1>
+      <h1>TatvaAI</h1>
       <p className="muted">Verified disclosure for AICTE approvals. Prototype with synthetic data only.</p>
       <label>Email<input value={email} onChange={(e) => setEmail(e.target.value)} autoFocus required list="demo-users" autoComplete="username" /></label>
       <datalist id="demo-users">{DEMO.map((d) => <option key={d} value={d} />)}</datalist>

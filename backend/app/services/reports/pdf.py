@@ -44,7 +44,7 @@ def _build(story: list, digest: str, title: str) -> bytes:
         c.drawString(15 * mm, 13 * mm, DISCLAIMER[:150])
         c.restoreState()
 
-    SimpleDocTemplate(buf, pagesize=A4, leftMargin=15 * mm, rightMargin=15 * mm, topMargin=14 * mm, bottomMargin=18 * mm, title=title, author="PramaanAI", invariant=1).build(
+    SimpleDocTemplate(buf, pagesize=A4, leftMargin=15 * mm, rightMargin=15 * mm, topMargin=14 * mm, bottomMargin=18 * mm, title=title, author="TatvaAI", invariant=1).build(
         copy.deepcopy(list(story)), onFirstPage=footer, onLaterPages=footer)  # flowables are mutated while laying out, so each pass gets fresh copies
     return buf.getvalue()
 
@@ -100,7 +100,7 @@ def application_report(db: Session, app: Application) -> tuple[bytes, str]:
     flags.sort(key=lambda f: (sev_rank[f.severity], f.id))
     tier = app.risk_tier or "UNSCORED"
     reasons = json.loads(app.risk_reasons or "[]")
-    s = [P("PramaanAI Validation Report", H1), P(DISCLAIMER, SMALL), Spacer(1, 4 * mm)]
+    s = [P("TatvaAI Validation Report", H1), P(DISCLAIMER, SMALL), Spacer(1, 4 * mm)]
     s.append(_table([["Institution", inst.name], ["AICTE ID (synthetic)", inst.aicte_id or "-"], ["State", inst.state], ["Application", f"#{app.id} - {app.category} - AY {app.academic_year}"],
                      ["Status", f"{app.status}{' (locked)' if app.locked else ''}"], ["Rule Pack version", app.rule_pack_version or "-"],
                      ["Generated", datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC")]], [45 * mm, 135 * mm], header=False))

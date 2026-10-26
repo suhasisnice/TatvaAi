@@ -52,7 +52,7 @@ export default function Shell({ user, onLogout, children }: { user: User; onLogo
   return (
     <>
       <header className="top">
-        <Link to="/" className="brand"><ShieldCheck size={20} aria-hidden /> PramaanAI</Link>
+        <Link to="/" className="brand"><ShieldCheck size={20} aria-hidden /> TatvaAI</Link>
         <nav aria-label="Main">{NAV[user.role].map(([to, label]) => <NavLink key={to} to={to} end={to.split("/").length <= 2}>{label}</NavLink>)}</nav>
         <span className="spacer" />
         <Bell_ user={user} />

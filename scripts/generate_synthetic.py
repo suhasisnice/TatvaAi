@@ -263,7 +263,7 @@ def _dms(v: float):
 
 def save_photo(img: Image.Image, path: Path, lat: float, lon: float, when: datetime, quality: int = 90) -> None:
     exif = piexif.dump({
-        "0th": {piexif.ImageIFD.Make: b"SynthCam", piexif.ImageIFD.Model: b"SC-1", piexif.ImageIFD.Software: b"PramaanAI Synthetic Generator"},
+        "0th": {piexif.ImageIFD.Make: b"SynthCam", piexif.ImageIFD.Model: b"SC-1", piexif.ImageIFD.Software: b"TatvaAI Synthetic Generator"},
         "Exif": {piexif.ExifIFD.DateTimeOriginal: when.strftime("%Y:%m:%d %H:%M:%S").encode()},
         "GPS": {piexif.GPSIFD.GPSLatitudeRef: b"N" if lat >= 0 else b"S", piexif.GPSIFD.GPSLatitude: _dms(lat),
                 piexif.GPSIFD.GPSLongitudeRef: b"E" if lon >= 0 else b"W", piexif.GPSIFD.GPSLongitude: _dms(lon)},

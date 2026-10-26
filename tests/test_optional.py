@@ -63,5 +63,5 @@ def test_missing_optional_libraries_do_not_break(sample):
 
 
 def test_llm_draft_endpoint_is_off_by_default(client, login):
-    r = client.post("/api/v1/rulepacks/draft-from-text", json={"text": "x"}, headers=login("officer@pramaan.test"))
+    r = client.post("/api/v1/rulepacks/draft-from-text", json={"text": "x"}, headers=login("officer@tatva.test"))
     assert r.status_code == 501 and "FEATURE_LLM" in r.json()["detail"]

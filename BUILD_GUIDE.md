@@ -1,6 +1,6 @@
-# PramaanAI: build guide for two people with the AI assistant
+# TatvaAI: build guide for two people with the AI assistant
 
-Source: `PramaanAI_SIH26261_Team_Guide.pdf` (SIH26261, AICTE Regulation Bureau). This file turns it into what you build, with what, and in what order. The old code is archived in `../_old/pramaanai` and can be copied from when useful.
+Source: `PramaanAI_SIH26261_Team_Guide.pdf` (SIH26261, AICTE Regulation Bureau). This file turns it into what you build, with what, and in what order. The old code is archived in `../_old/tatvaai` and can be copied from when useful.
 
 **Core idea:** a college uploads its EoA documents. The system extracts fields, verifies documents against (mock) issuers, checks them cryptographically and forensically, checks consistency and Handbook norms, then gives a risk tier (GREEN no risk, AMBER medium, RED high) and a ranked inspection list. Every finding is evidence-linked. An officer decides. **The software never approves or rejects.**
 

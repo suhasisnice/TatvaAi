@@ -88,7 +88,7 @@ def test_faculty_loaded(loaded):
 
 def test_upload_api_last(loaded, client, login):  # `client` resets the DB, so keep this test last in the module
     _, _, out = loaded
-    a_head, b_head = login("inst-a@pramaan.test"), login("inst-b@pramaan.test")
+    a_head, b_head = login("inst-a@tatva.test"), login("inst-b@tatva.test")
     app_id = client.post("/api/v1/applications", json={}, headers=a_head).json()["id"]
     sample = (out / "a/2027-28/docs/TER_RECEIPT.pdf").read_bytes()
     r = client.post(f"/api/v1/applications/{app_id}/documents", files={"file": ("x.pdf", sample, "application/pdf")}, headers=a_head)
