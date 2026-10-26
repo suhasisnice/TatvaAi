@@ -9,7 +9,7 @@ from app.core.db import get_db
 from app.core.config import UPLOAD_DIR, ALLOWED_EXTENSIONS, MAX_UPLOAD_MB
 from app.deps import get_current_user, require_roles
 from app.models import Application, Document, User, Flag, Verification, FacultyRegistryEntry
-from app.schemas import ApplicationCreate, FlagDecisionIn
+from app.schemas import ApplicationCreate, FlagDecisionIn, InspectionDecisionIn
 from app.services import extraction, pipeline, audit, scoring
 
 router = APIRouter(prefix="/api/v1/applications", tags=["applications"])
@@ -233,6 +233,28 @@ def decide_flag(flag_id: int, body: FlagDecisionIn, user: User = Depends(require
     audit.record(db, user.email, f"flag.{body.decision.lower()}", f"flag:{flag_id}",
                  {"reason": body.reason, "score_before": before, "score_after": score})
     return {"flag_id": flag_id, "status": flag.status, "score_before": before, "score_after": score, "tier": tier}
+
+
+@router.post("/flags/{flag_id}/inspection")
+def inspect_flag(flag_id: int, body: InspectionDecisionIn, user: User = Depends(require_roles("inspector", "admin")),
+                  db: Session = Depends(get_db)):
+    """The EVC's own on-site verdict on a flagged item -- separate from the
+    officer's accept/dismiss, which only screens findings before a visit."""
+    if body.status not in ("CONFIRMED", "CLEARED"):
+        raise HTTPException(status_code=400, detail="status must be CONFIRMED or CLEARED")
+    if len(body.note.strip()) < 5:
+        raise HTTPException(status_code=400, detail="Note must be at least 5 characters")
+    flag = db.query(Flag).get(flag_id)
+    if not flag:
+        raise HTTPException(status_code=404, detail="Not found")
+    from datetime import datetime
+    flag.inspection_status = body.status
+    flag.inspection_note = body.note
+    flag.inspection_by = user.name
+    flag.inspected_at = datetime.utcnow()
+    db.commit()
+    audit.record(db, user.email, f"inspection.{body.status.lower()}", f"flag:{flag_id}", {"note": body.note})
+    return {"flag_id": flag_id, "inspection_status": flag.inspection_status}
 
 
 @router.post("/verifications/{verification_id}/manual")

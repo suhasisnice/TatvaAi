@@ -1,4 +1,4 @@
-const BASE = "http://127.0.0.1:8000";
+const BASE = "http://127.0.0.1:8010";
 
 export type Session = { token: string; role: string; name: string; institutionId: number | null };
 
@@ -59,6 +59,8 @@ export const api = {
     request(`/api/v1/applications/flags/${flagId}/decision`, { method: "POST", body: JSON.stringify({ decision, reason }) }),
   manualVerify: (verificationId: number, note: string) =>
     request(`/api/v1/applications/verifications/${verificationId}/manual?note=${encodeURIComponent(note)}`, { method: "POST" }),
+  decideInspection: (flagId: number, status: "CONFIRMED" | "CLEARED", note: string) =>
+    request(`/api/v1/applications/flags/${flagId}/inspection`, { method: "POST", body: JSON.stringify({ status, note }) }),
   queue: () => request("/api/v1/risk/queue"),
   inspectionList: () => request("/api/v1/risk/inspection-list"),
   auditLog: () => request("/api/v1/audit"),

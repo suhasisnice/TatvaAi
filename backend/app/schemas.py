@@ -23,3 +23,8 @@ class ApplicationCreate(BaseModel):
 class FlagDecisionIn(BaseModel):
     decision: str  # ACCEPT or DISMISS
     reason: str
+
+
+class InspectionDecisionIn(BaseModel):
+    status: str  # CONFIRMED or CLEARED
+    note: str

@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session
 
 from app.core.db import get_db
 from app.deps import require_roles
-from app.models import Application, Flag, User
+from app.models import Application, Document, Flag, User
 
 router = APIRouter(prefix="/api/v1/risk", tags=["risk"])
 
@@ -44,6 +44,14 @@ def queue(user: User = Depends(require_roles("officer", "inspector", "admin")), 
     return {"kpi": kpi, "rows": rows}
 
 
+def _flag_document(db: Session, flag: Flag) -> Document | None:
+    for item in (flag.evidence or []):
+        doc_id = item.get("document_id")
+        if doc_id:
+            return db.query(Document).get(doc_id)
+    return None
+
+
 @router.get("/inspection-list")
 def inspection_list(user: User = Depends(require_roles("officer", "inspector", "admin")), db: Session = Depends(get_db)):
     apps = (
@@ -60,15 +68,42 @@ def inspection_list(user: User = Depends(require_roles("officer", "inspector", "
             .order_by(Flag.severity.desc())
             .all()
         )
-        codes_seen = []
-        checklist = []
+
+        groups: dict[str, dict] = {}
         for f in flags:
-            if f.code in codes_seen:
-                continue
-            codes_seen.append(f.code)
-            checklist.append({"code": f.code, "instruction": CHECKLIST_TEXT.get(f.code, "Verify on site.")})
+            doc = _flag_document(db, f)
+            key = f"doc:{doc.id}" if doc else "institution"
+            if key not in groups:
+                groups[key] = {
+                    "document_id": doc.id if doc else None,
+                    "document_type": doc.doc_type.replace("_", " ").title() if doc else "Institution-wide",
+                    "file_name": doc.file_name if doc else None,
+                    "items": [],
+                }
+            groups[key]["items"].append({
+                "flag_id": f.id, "code": f.code, "severity": f.severity,
+                "message": f.message,
+                "instruction": CHECKLIST_TEXT.get(f.code, "Verify on site."),
+                "inspection_status": f.inspection_status, "inspection_note": f.inspection_note,
+                "inspection_by": f.inspection_by,
+            })
+
+        # Institution-wide group last; otherwise keep CRITICAL-first document order.
+        ordered_groups = sorted(
+            groups.values(),
+            key=lambda g: (g["document_id"] is None, -max(
+                {"CRITICAL": 3, "MAJOR": 2, "MINOR": 1}.get(i["severity"], 0) for i in g["items"]
+            )),
+        )
+
+        total_items = sum(len(g["items"]) for g in ordered_groups)
+        resolved_items = sum(
+            1 for g in ordered_groups for i in g["items"] if i["inspection_status"] != "PENDING"
+        )
+
         result.append({
             "application_id": a.id, "institution_name": a.institution.name, "score": a.risk_score,
-            "top_reasons": a.top_reasons or [], "checklist": checklist,
+            "top_reasons": a.top_reasons or [], "document_groups": ordered_groups,
+            "progress": {"resolved": resolved_items, "total": total_items},
         })
     return result

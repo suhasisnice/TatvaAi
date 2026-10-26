@@ -35,7 +35,7 @@ cd backend
 python -m venv .venv
 .venv/Scripts/pip install -r requirements.txt
 .venv/Scripts/python -m app.seed        # resets the DB and loads 3 demo institutions
-.venv/Scripts/python -m uvicorn app.main:app --port 8000 --reload
+.venv/Scripts/python -m uvicorn app.main:app --port 8010 --reload
 ```
 
 ### Frontend

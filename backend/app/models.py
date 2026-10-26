@@ -102,6 +102,14 @@ class Flag(Base):
     fingerprint = Column(String, nullable=False)
     created_at = Column(DateTime, default=datetime.utcnow)
 
+    # EVC / inspection committee's own on-site verdict for this flag, separate
+    # from the officer's accept/dismiss above (an officer screens findings
+    # before inspection; an inspector records what they actually found on site).
+    inspection_status = Column(String, default="PENDING")  # PENDING, CONFIRMED, CLEARED
+    inspection_note = Column(Text, nullable=True)
+    inspection_by = Column(String, nullable=True)
+    inspected_at = Column(DateTime, nullable=True)
+
     application = relationship("Application", back_populates="flags")
 
 
