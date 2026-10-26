@@ -61,6 +61,21 @@ export const api = {
     request(`/api/v1/applications/verifications/${verificationId}/manual?note=${encodeURIComponent(note)}`, { method: "POST" }),
   decideInspection: (flagId: number, status: "CONFIRMED" | "CLEARED", note: string) =>
     request(`/api/v1/applications/flags/${flagId}/inspection`, { method: "POST", body: JSON.stringify({ status, note }) }),
+  alerts: () => request("/api/v1/alerts"),
+  markAlertRead: (id: number) => request(`/api/v1/alerts/${id}/read`, { method: "POST" }),
+  async downloadReport(appId: number) {
+    const session = getSession();
+    const res = await fetch(`${BASE}/api/v1/applications/${appId}/report.pdf`, {
+      headers: { Authorization: `Bearer ${session?.token}` },
+    });
+    if (!res.ok) throw new Error("Could not generate the report");
+    const url = URL.createObjectURL(await res.blob());
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `validation-report-${appId}.pdf`;
+    a.click();
+    URL.revokeObjectURL(url);
+  },
   queue: () => request("/api/v1/risk/queue"),
   inspectionList: () => request("/api/v1/risk/inspection-list"),
   auditLog: () => request("/api/v1/audit"),

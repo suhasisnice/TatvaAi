@@ -2,7 +2,7 @@ import csv
 import shutil
 from pathlib import Path
 
-from fastapi import APIRouter, Depends, HTTPException, UploadFile, File
+from fastapi import APIRouter, Depends, HTTPException, UploadFile, File, Response
 from sqlalchemy.orm import Session
 
 from app.core.db import get_db
@@ -10,7 +10,7 @@ from app.core.config import UPLOAD_DIR, ALLOWED_EXTENSIONS, MAX_UPLOAD_MB
 from app.deps import get_current_user, require_roles
 from app.models import Application, Document, User, Flag, Verification, FacultyRegistryEntry
 from app.schemas import ApplicationCreate, FlagDecisionIn, InspectionDecisionIn
-from app.services import extraction, pipeline, audit, scoring
+from app.services import extraction, pipeline, audit, scoring, alerts, report
 
 router = APIRouter(prefix="/api/v1/applications", tags=["applications"])
 
@@ -88,6 +88,20 @@ def get_application(app_id: int, user: User = Depends(get_current_user), db: Ses
             for v in verifications
         ],
     }
+
+
+@router.get("/{app_id}/report.pdf")
+def report_pdf(app_id: int, user: User = Depends(require_roles("officer", "inspector")), db: Session = Depends(get_db)):
+    app_obj = db.query(Application).get(app_id)
+    if not app_obj:
+        raise HTTPException(status_code=404, detail="Not found")
+    docs = db.query(Document).filter(Document.application_id == app_id).all()
+    flags = db.query(Flag).filter(Flag.application_id == app_id).all()
+    verifs = db.query(Verification).filter(Verification.application_id == app_id).all()
+    pdf = report.build_report(app_obj, docs, flags, verifs)
+    audit.record(db, user.email, "report.generate", f"application:{app_id}", {"bytes": len(pdf)})
+    return Response(content=pdf, media_type="application/pdf",
+                    headers={"Content-Disposition": f'attachment; filename="validation-report-{app_id}.pdf"'})
 
 
 @router.post("/{app_id}/documents")
@@ -178,6 +192,7 @@ def submit_application(app_id: int, user: User = Depends(require_roles("institut
     app_obj.status = "SUBMITTED"
     app_obj.submitted_at = datetime.utcnow()
     db.commit()
+    alerts.generate_alerts(db, app_obj)
     audit.record(db, user.email, "application.submit", f"application:{app_id}")
     return _serialize_application(app_obj)
 

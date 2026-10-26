@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { RefreshCw, Unlock } from "lucide-react";
+import { RefreshCw, Unlock, FileDown } from "lucide-react";
 import { api } from "../../lib/api";
 import { TierBadge, SevBadge } from "../../components/Badges";
 
@@ -57,6 +57,9 @@ export default function Workbench() {
           <span className="muted small">score {app.risk_score}</span>
           <button className="btn secondary" onClick={revalidate} disabled={busy}>
             <RefreshCw size={14} /> Re-run validation
+          </button>
+          <button className="btn secondary" onClick={() => api.downloadReport(Number(id)).catch((e: any) => alert(e.message))}>
+            <FileDown size={14} /> Validation report
           </button>
           {app.status === "SUBMITTED" && app.reopen_count < 1 && (
             <button className="btn secondary" onClick={reopen} disabled={busy} title="Allowed once (Clause 2.3.3, p.14)">
