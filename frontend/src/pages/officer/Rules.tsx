@@ -12,6 +12,7 @@ export default function Rules() {
   const [diff, setDiff] = useState<J>(null);
   const [busy, setBusy] = useState("");
   const [folder, setFolder] = useState("APH-2024-27-v2-demo");
+  const [handbookText, setHandbookText] = useState("");
   const pack = packs.data?.find((p) => p.version === sel);
 
   useEffect(() => {
@@ -27,6 +28,16 @@ export default function Rules() {
   const validate = () => run("validate", async () => { const r = await post<J>("/rulepacks/validate-yaml", { yaml }); setErrors(r.errors); setMsg(r.valid ? "Valid: schema, ids and expressions are fine." : ""); });
   const save = () => run("save", async () => { const r = await post<J>("/rulepacks", { yaml }); setMsg(`Saved ${r.version} as a draft (${r.rule_count} rules).`); packs.reload(); setSel(r.version); });
   const importDir = () => run("import", async () => { const r = await post<J>("/rulepacks", { from_dir: folder }); setMsg(`Created ${r.version} as a draft from the rulepacks folder.`); packs.reload(); setSel(r.version); });
+  const draftWithAi = () => run("draft", async () => {
+    try {
+      const r = await post<J>("/rulepacks/draft-from-text", { text: handbookText });
+      setYaml(r.draft_yaml); setSel("");
+      setMsg("AI draft loaded into the editor. It is unreviewed and nothing is stored: validate it, save as a new draft, dry-run, then activate.");
+    } catch (e) {
+      if (e instanceof ApiError && e.status === 501) throw new Error("The AI rule-draft helper is switched off. Set FEATURE_LLM=true and run a local Ollama model to use it.");
+      throw e;
+    }
+  });
   const dry = () => run("dry", async () => setDiff(await post<J>(`/rulepacks/${sel}/dry-run`)));
   const activate = () => {
     if (!confirm(`Activate rule pack ${sel}?\n\nNew validations will use it. Results already produced under other versions are not changed.`)) return;
@@ -68,6 +79,12 @@ export default function Rules() {
               <button className="primary" onClick={activate} disabled={!!busy || !pack || pack.status === "active"}>Activate</button>
             </div>
           </div>
+          <details className="draft-helper">
+            <summary>Rule-draft helper (AI drafts, a human approves)</summary>
+            <p className="muted">Paste a Handbook paragraph. A local model proposes a rule in YAML; you must validate it, save it as a new draft and dry-run it before anything goes live.</p>
+            <textarea aria-label="Handbook text" rows={4} value={handbookText} onChange={(e) => setHandbookText(e.target.value)} placeholder="e.g. Annexure-5, 5.2: UG Engineering faculty-student ratio 1:20 ..." />
+            <button onClick={draftWithAi} disabled={!!busy || handbookText.trim().length < 20}>Draft rule with AI</button>
+          </details>
           <textarea className="yaml" aria-label="Rule pack YAML" spellCheck={false} value={yaml} onChange={(e) => setYaml(e.target.value)} rows={18} />
           {msg && <p role="status" className="ok">{msg}</p>}
           {errors.length > 0 && <ul role="alert" className="errlist">{errors.map((e, i) => <li key={i}>{e}</li>)}</ul>}

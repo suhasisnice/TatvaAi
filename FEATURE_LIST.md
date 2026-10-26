@@ -1,5 +1,7 @@
 # TatvaAI: feature list in simple words
 
+Follows the [feature map](docs/FEATURE_MAP.md).
+
 ## What the project does
 Every year, colleges ask AICTE to renew their approval. They upload documents like fire safety and land certificates. Officers check them by hand, which is slow, and fake or expired papers can slip through.
 
@@ -7,82 +9,66 @@ TatvaAI reads those documents, checks them, and warns the officer about problems
 
 **The software never approves or rejects anyone. A human officer decides, and must write a reason.**
 
-Status words: **Done** = works for real. **Fake for now** = the screen can be built, but the data is made up. **To build** = not started.
+Status words: **Done** = works for real and is covered by tests.
 
----
+## The three main features
 
-## 1. For the college
+### Feature 1: Handbook rule checker
 | Feature | What it means | Status |
 |---|---|---|
-| Login | Each person signs in as college, officer or inspector | Done |
-| Start an application | Pick the year and type (renewal, more seats, name change) | Done |
-| Upload documents | PDFs, photos and the faculty list are accepted and safety-checked | Done |
-| Recognise documents | The system says what each file is, like "fire certificate, 97% sure" | Done |
-| Pre-check | A plain to-do list of what to fix before submitting | Done |
-| Submit | Locks the application; the officer can reopen it once | Done |
+| Teachers, rooms, computers, bandwidth | Checked against the AICTE Handbook numbers | Done |
+| Built-up area | Declared building area compared with the buildings on the map | Done |
+| Certificate dates | Expired certificates, or ones that run out before the academic year starts | Done |
+| Clause and page on every warning | Each warning says which Handbook rule it comes from | Done |
+| Rules in files | The norms are editable files, not hidden in code | Done |
 
-## 2. Reading the documents
+### Feature 2: Document & consistency check
 | Feature | What it means | Status |
 |---|---|---|
-| Read the fields | Finds each value (dates, numbers, names) and remembers where it sits on the page | Done |
-| Check digital signatures | Sees if a document was changed after it was signed, and shows what changed | Done |
-| Read QR codes | Compares the QR with the printed text | Done |
-| Read photo details | Where and when a photo was taken | Done |
-| Read the faculty list | Turns the spreadsheet into records | Done |
-
-## 3. Checking with the original source
-| Feature | What it means | Status |
-|---|---|---|
-| Fake government sources | Pretend e-stamp, DigiLocker, CA, fire, building and AICTE systems | Done |
-| Ask the source | Ask the right source if each document is real | Done |
+| Genuine document check | Sees if a document was changed after it was signed, and shows what changed; QR codes compared with the printed text | Done |
+| Source check | Asks the issuing source (fake e-stamp, DigiLocker, CA, fire, building, AICTE systems, all labelled MOCK) if the document is real | Done |
 | Six answers | Verified, mismatch, expired, pending, source down, needs manual check | Done |
-| Source is down | The case goes to a person instead of getting stuck | Done |
-| Reuse last year | A document already verified last year is not checked again | Done |
+| Facts agree | The same fact is compared across documents, years, colleges and the college website | Done |
+| Ghost teachers | A teacher listed full-time at two colleges is caught | Done |
+| Copied photos | Reused or far-away photos are caught | Done |
 
-## 4. The five checkers (they raise warnings, called flags)
-| Checker | What it looks for | Status |
-|---|---|---|
-| Source checker | Source says the document is fake, expired or unreachable | Done |
-| Authenticity checker | Edited after signing, QR mismatch, copied documents | Done |
-| Completeness checker | Missing, unsigned or expired documents and fields | Done |
-| Consistency checker | The same fact disagrees between documents, years or the college website | Done |
-| Rules checker | Not enough teachers, rooms, computers or building area; photos taken far from the campus | Done |
-
-Every warning has a plain message, the proof it is based on, and the Handbook clause where it applies.
-
-## 5. Rules, risk and inspections
+### Feature 3: Risk ranking & officer review
 | Feature | What it means | Status |
 |---|---|---|
-| Rules in a file | AICTE norms are kept in editable files, not hidden in code | Done |
-| Evidence collection | All facts gathered with where each came from | Done |
 | Risk score and colour | Warnings add up to GREEN, AMBER or RED | Done |
-| Inspection list | RED colleges ranked, with reasons and an on-site checklist | Done |
-| Rule editor for the officer | Test a rule change before turning it on | Done |
-
-## 6. Officer and inspector screens
-| Feature | What it means | Status |
-|---|---|---|
 | Review queue | All colleges, highest risk first | Done |
 | Review page | Summary, warnings with proof, verification, rules, map | Done |
-| Show the proof | Opens the document page with the exact spot highlighted | Done |
-| Accept or dismiss | Officer decides each warning and must write a reason; there is no reject button | Done |
-| Alerts | Missing info, expiring documents, suspicious findings | Done |
-| PDF report | A full report with the proof images | Done |
+| Accept or dismiss | The officer decides each warning and must write a reason; there is no reject button | Done |
+| Decision support only | A banner on every officer and inspector page says so | Done |
 
-## 7. Safety and trust
+## Smaller features that keep them working
 | Feature | What it means | Status |
 |---|---|---|
-| Each user sees only their data | Colleges see only their own application | Done |
-| Tamper-proof history | Every action is logged in a chain that shows if anyone altered it | Done |
-| Document viewing log | Who opened which document | Done |
-| Extra login step | Code from a phone app, for officers | Done |
-| Only invented data | All names, colleges and sources are fake and labelled | Done |
+| Document sorter | Says what each file is ("fire certificate, 97% sure") and finds each field | Done |
+| Last year's records | A document already verified last year is not checked again | Done |
+| Course & intake settings | The college sets its courses and seats; the norms are worked out from them | Done |
+| Evidence viewer | Opens the document page with the exact spot highlighted | Done |
+| Plain-language reasons | Every warning has a message in simple words | Done |
+| Rule versions with dry-run | Test a rule change on every application before turning it on | Done |
+| Rule-draft helper | An AI drafts a rule from Handbook text; a human must approve it (off unless switched on) | Done |
+| Audit log | Every decision is logged in a chain that shows if anyone altered it | Done |
+| Fix-list before submit | The college sees what to fix, in plain words, before submitting | Done |
+| Alerts, PDF report, phone-app login | Missing info and expiry alerts, a full report with proof images, a code from a phone app for officers | Done |
 
----
+## What each person gets
+- **The inspector:** a ranked list instead of random picks, and a PDF on-site checklist. On site, the inspector marks each flagged item **Confirmed** or **Cleared** with a note, and a progress bar shows how much of the visit is done.
+- **The college:** a fix-list before it submits. A college only ever sees its own application.
+
+## Why it is different
+| | |
+|---|---|
+| U1 Explainable | Every warning cites its Handbook clause and page |
+| U2 Cross-checking | Facts are checked across documents, years and colleges |
+| U3 Human in control | Decision support only, never auto approve or reject |
+| U4 Audit | Tamper-evident, hash-chained log of every decision |
+| U5 Prevention | Colleges fix problems before they submit |
+| U6 Targeting | Red, amber and green tiers send inspectors to the riskiest colleges first |
+| U7 Maintainability | Rules update without redeploying: an AI drafts, a human approves, a dry-run shows the effect |
 
 ## What exists today
-Everything above is built and covered by the automated tests (backend suite plus the frontend build and smoke test), working against three made-up colleges: A is clean, B has two problems, C has many hidden ones (a land record edited after signing, 12 duplicate teachers, a copied photo).
-
-The inspector now has a per-document on-site checklist: for every flagged item they record **Confirmed** (the issue is real) or **Cleared** (false alarm) with a written note, and a progress bar shows how much of the visit is done. This is separate from the officer's earlier accept/dismiss screening.
-
-Optional extras stay switched off by default (scanned-page OCR, PC counting in lab photos, a local model that drafts rules). All sources are fake and labelled MOCK.
+Everything above is built and covered by the automated tests (backend suite plus the frontend build and smoke test), working against three made-up colleges: A is clean, B has two problems, C has many hidden ones (a land record edited after signing, 12 duplicate teachers, a copied photo). Optional extras stay switched off by default (scanned-page OCR, PC counting in lab photos, the AI rule-draft helper). All sources are fake and labelled MOCK.

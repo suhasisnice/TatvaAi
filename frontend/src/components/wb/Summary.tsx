@@ -8,7 +8,7 @@ export default function Summary({ app, docs }: { app: J; docs: J[] }) {
   const flags = useApi<J[]>(`/flags?application_id=${app.id}`);
   const risk = app.risk;
   const live = (flags.data ?? []).filter((f) => f.status !== "DISMISSED" && f.severity !== "INFO");
-  const byEngine = live.reduce<Record<string, number>>((m, f) => ({ ...m, [f.engine]: (m[f.engine] ?? 0) + 1 }), {});
+  const byFeature = live.reduce<Record<string, number>>((m, f) => ({ ...m, [f.feature_label]: (m[f.feature_label] ?? 0) + 1 }), {});
   return (
     <>
       <section className="card">
@@ -23,7 +23,7 @@ export default function Summary({ app, docs }: { app: J; docs: J[] }) {
             {!risk?.reasons?.length && <tr><td colSpan={3} className="muted">No findings.</td></tr>}
           </tbody>
         </table>
-        <p className="muted">Rule pack {risk?.rule_pack_version}. Open findings by engine: {Object.entries(byEngine).map(([k, v]) => `${k} ${v}`).join(" · ") || "none"}.</p>
+        <p className="muted">Rule pack {risk?.rule_pack_version}. Open findings: {Object.entries(byFeature).map(([k, v]) => `${k} ${v}`).join(" · ") || "none"}.</p>
       </section>
       <section className="card">
         <h2>Documents and proof level</h2>

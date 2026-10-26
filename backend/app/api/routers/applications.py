@@ -26,6 +26,28 @@ class FormPatch(BaseModel):
     form: dict
 
 
+LEVELS = ("UG", "PG", "DIPLOMA")
+
+
+def clean_programmes(items) -> list[dict]:
+    """Course & intake settings: validate what the college typed and derive divisions (60 seats each).
+    The faculty, room and computer norms are computed from these numbers, so bad input is refused, not guessed."""
+    if not isinstance(items, list) or not items:
+        raise HTTPException(422, "Add at least one course")
+    out_list = []
+    for i, p in enumerate(items, start=1):
+        try:
+            course, level = str(p.get("course", "")).strip(), str(p.get("level", "UG")).upper()
+            intake, duration = int(p["intake"]), int(p.get("duration", 4))
+        except (AttributeError, KeyError, TypeError, ValueError):
+            raise HTTPException(422, f"Course {i}: name, level, intake and duration are required numbers")
+        if not course or level not in LEVELS or not 1 <= intake <= 2000 or not 1 <= duration <= 6:
+            raise HTTPException(422, f"Course {i}: needs a name, level UG/PG/DIPLOMA, intake 1 to 2000 and duration 1 to 6 years")
+        out_list.append(dict(course=course, level=level, intake=intake, duration=duration, divisions=max(1, -(-intake // 60)),
+                             programme=p.get("programme") or "ENGINEERING_AND_TECHNOLOGY"))
+    return out_list
+
+
 def out(db: Session, a: Application, user: User, detail: bool = False) -> dict:
     d = {c.name: getattr(a, c.name) for c in Application.__table__.columns if c.name not in ("form_data", "risk_reasons")}
     inst = inst_of(db, a)
@@ -74,6 +96,8 @@ def patch_application(app_id: int, body: FormPatch, user: User = Depends(require
     if a.locked:
         raise HTTPException(409, "Application is submitted and locked; ask the Regulation Bureau to reopen it")
     form = json.loads(a.form_data) if a.form_data else {}
+    if "programmes" in body.form:
+        body.form["programmes"] = clean_programmes(body.form["programmes"])
     for k, v in body.form.items():
         form[k] = {**form[k], **v} if isinstance(form.get(k), dict) and isinstance(v, dict) else v
     a.form_data = json.dumps(form)

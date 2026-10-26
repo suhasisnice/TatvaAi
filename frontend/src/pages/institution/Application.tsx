@@ -2,6 +2,7 @@ import { CheckCircle2, CircleDashed, Lock, Upload } from "lucide-react";
 import { ChangeEvent, FormEvent, useState } from "react";
 import { useParams } from "react-router-dom";
 import { api, J, post } from "../../api";
+import CourseIntake from "../../components/CourseIntake";
 import { useApi } from "../../hooks";
 import { ErrorBox, fmtDate, Loading, SeverityChip } from "../../ui";
 
@@ -83,7 +84,6 @@ export default function InstApp() {
           <dt>Signatory</dt><dd>{form.signatory?.name}</dd>
           <dt>Declared full-time faculty</dt><dd>{form.faculty?.declared_full_time}</dd>
           <dt>Declared built-up area</dt><dd>{form.declared_built_up_total_m2?.toLocaleString()} sq m</dd>
-          <dt>Programmes</dt><dd>{(form.programmes ?? []).map((p: J) => `${p.course} (${p.level}, intake ${p.intake})`).join("; ")}</dd>
         </dl>
         {!locked && (
           <form onSubmit={saveDetails} className="row gap end">
@@ -94,6 +94,8 @@ export default function InstApp() {
           </form>
         )}
       </section>
+
+      <CourseIntake appId={Number(id)} programmes={form.programmes ?? []} locked={locked} onSaved={app.reload} />
 
       <section className="card">
         <div className="row between">

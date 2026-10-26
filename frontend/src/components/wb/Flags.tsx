@@ -2,13 +2,13 @@ import { useEffect, useMemo, useState } from "react";
 import { J, post } from "../../api";
 import { useApi } from "../../hooks";
 import EvidenceViewer from "../EvidenceViewer";
-import { cite, ErrorBox, fmtDate, Loading, MockTag, Prelim, SeverityChip } from "../../ui";
+import { cite, ErrorBox, FEATURES, fmtDate, Loading, MockTag, Prelim, SeverityChip } from "../../ui";
 
 const ORDER: Record<string, number> = { CRITICAL: 0, MAJOR: 1, MINOR: 2, INFO: 3 };
 
 export default function Flags({ appId, docs, canDecide, onChanged, focusFlagId }: { appId: number; docs: J[]; canDecide: boolean; onChanged: () => void; focusFlagId?: number }) {
   const flags = useApi<J[]>(`/flags?application_id=${appId}`);
-  const [engine, setEngine] = useState("");
+  const [feature, setFeature] = useState("");
   const [showInfo, setShowInfo] = useState(false);
   const [showDismissed, setShowDismissed] = useState(true);
   const [sel, setSel] = useState<number | null>(null);
@@ -16,8 +16,8 @@ export default function Flags({ appId, docs, canDecide, onChanged, focusFlagId }
   const [reason, setReason] = useState("");
   const [err, setErr] = useState("");
   const docMap = useMemo(() => Object.fromEntries(docs.map((d) => [d.id, d])), [docs]);
-  const list = useMemo(() => (flags.data ?? []).filter((f) => (!engine || f.engine === engine) && (showInfo || f.severity !== "INFO") && (showDismissed || f.status !== "DISMISSED"))
-    .sort((a, b) => ORDER[a.severity] - ORDER[b.severity] || a.id - b.id), [flags.data, engine, showInfo, showDismissed]);
+  const list = useMemo(() => (flags.data ?? []).filter((f) => (!feature || String(f.feature) === feature) && (showInfo || f.severity !== "INFO") && (showDismissed || f.status !== "DISMISSED"))
+    .sort((a, b) => ORDER[a.severity] - ORDER[b.severity] || a.id - b.id), [flags.data, feature, showInfo, showDismissed]);
   useEffect(() => { if (focusFlagId) setSel(focusFlagId); }, [focusFlagId]);
   useEffect(() => { if (sel == null && list.length) setSel(list[0].id); }, [list, sel]);
   const flag = (flags.data ?? []).find((f) => f.id === sel);
@@ -38,7 +38,7 @@ export default function Flags({ appId, docs, canDecide, onChanged, focusFlagId }
     <div className="split">
       <div className="left">
         <div className="row gap end filters">
-          <label>Engine<select value={engine} onChange={(e) => setEngine(e.target.value)}><option value="">All</option>{["completeness", "consistency", "authenticity", "issuer", "compliance"].map((x) => <option key={x}>{x}</option>)}</select></label>
+          <label>Feature<select value={feature} onChange={(e) => setFeature(e.target.value)}><option value="">All findings</option>{[1, 2].map((n) => <option key={n} value={n}>{FEATURES[n]}</option>)}</select></label>
           <label className="check"><input type="checkbox" checked={showInfo} onChange={(e) => setShowInfo(e.target.checked)} /> Notices (INFO)</label>
           <label className="check"><input type="checkbox" checked={showDismissed} onChange={(e) => setShowDismissed(e.target.checked)} /> Dismissed</label>
         </div>
@@ -55,7 +55,7 @@ export default function Flags({ appId, docs, canDecide, onChanged, focusFlagId }
         </ul>
         {flag && (
           <article className="card flagdetail" aria-label="Flag detail">
-            <h3><code>{flag.code}</code> <SeverityChip severity={flag.severity} /> <span className="chip grey">{flag.engine}</span></h3>
+            <h3><code>{flag.code}</code> <SeverityChip severity={flag.severity} /> <span className="chip grey" title={`engine: ${flag.engine}`}>{FEATURES[flag.feature]}</span></h3>
             {flag.preliminary_indicator && <p><Prelim /></p>}
             <p>{flag.message}</p>
             {flag.explanation && <p className="muted">{flag.explanation}</p>}

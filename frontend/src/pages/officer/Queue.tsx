@@ -17,7 +17,7 @@ export default function Queue() {
   const stats = useApi<J>("/risk/stats");
   const nav = useNavigate();
   const byTier = useMemo(() => ["RED", "AMBER", "GREEN"].map((t) => ({ name: `${t} (${TIER[t].label})`, tier: t, count: stats.data?.by_tier?.[t] ?? 0 })), [stats.data]);
-  const byEngine = useMemo(() => Object.entries(stats.data?.flags_by_engine ?? {}).map(([engine, count]) => ({ engine, count })), [stats.data]);
+  const byFeature = useMemo(() => Object.entries(stats.data?.flags_by_feature ?? {}).map(([feature, count]) => ({ feature, count })), [stats.data]);
   const s = stats.data;
 
   return (
@@ -39,10 +39,10 @@ export default function Queue() {
               <Bar dataKey="count" name="Applications">{byTier.map((d) => <Cell key={d.tier} fill={COLORS[d.tier]} />)}</Bar></BarChart>
           </ResponsiveContainer>
         </figure>
-        <figure className="card chart" aria-label="Findings by engine">
-          <figcaption>Findings by engine</figcaption>
+        <figure className="card chart" aria-label="Findings by feature">
+          <figcaption>Findings by feature</figcaption>
           <ResponsiveContainer width="100%" height={200}>
-            <BarChart data={byEngine}><CartesianGrid strokeDasharray="3 3" /><XAxis dataKey="engine" fontSize={12} /><YAxis allowDecimals={false} /><Tooltip /><Bar dataKey="count" name="Findings" fill="#1F3864" /></BarChart>
+            <BarChart data={byFeature}><CartesianGrid strokeDasharray="3 3" /><XAxis dataKey="feature" fontSize={12} /><YAxis allowDecimals={false} /><Tooltip /><Bar dataKey="count" name="Findings" fill="#1F3864" /></BarChart>
           </ResponsiveContainer>
         </figure>
       </div>

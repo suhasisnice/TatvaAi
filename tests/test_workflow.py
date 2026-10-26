@@ -283,3 +283,31 @@ def test_dry_run_then_activate_keeps_old_results_last(env):
         assert s["rule_pack_version"] == "v2-demo" and s["tier"] == "AMBER"
     log = api.get("/api/v1/audit?action=rulepack", headers=off).json()
     assert [e["action"] for e in log][:3][::-1] == ["rulepack.create", "rulepack.dry_run", "rulepack.activate"]
+
+
+def test_flags_roll_up_into_the_two_checking_features(env):
+    api, off = env["api"], env["login"]("officer@tatva.test")
+    flags = api.get(f"/api/v1/flags?application_id={env['ids']['c', AY]}", headers=off).json()
+    by_code = {f["code"]: f for f in flags}
+    assert by_code["NORM_FACULTY_SHORTFALL"]["feature"] == 1 and by_code["NORM_FACULTY_SHORTFALL"]["feature_label"] == "Handbook rule checker"
+    assert by_code["MODIFIED_AFTER_SIGNING"]["feature"] == 2 and by_code["DUPLICATE_FACULTY_CROSS_INSTITUTION"]["feature_label"] == "Document & consistency check"
+    assert {f["feature"] for f in flags} == {1, 2}
+    stats = api.get("/api/v1/risk/stats", headers=off).json()["flags_by_feature"]
+    assert set(stats) == {"Handbook rule checker", "Document & consistency check"} and sum(stats.values()) > 0
+
+
+def test_course_and_intake_settings_are_validated_and_drive_the_norms(env):
+    api, a = env["api"], env["login"]("inst-a@tatva.test")
+    app_id = api.post("/api/v1/applications", json={"category": "EOA", "academic_year": "2028-29"}, headers=a).json()["id"]
+    bad = [[], [{"course": "", "level": "UG", "intake": 60}], [{"course": "CSE", "level": "XX", "intake": 60}], [{"course": "CSE", "level": "UG", "intake": 0}], [{"course": "CSE", "level": "UG", "intake": "many"}]]
+    for programmes in bad:
+        assert api.patch(f"/api/v1/applications/{app_id}", json={"form": {"programmes": programmes}}, headers=a).status_code == 422
+    ok = api.patch(f"/api/v1/applications/{app_id}", json={"form": {"programmes": [{"course": "Computer Science and Engineering", "level": "ug", "intake": 240, "duration": 4}]}}, headers=a)
+    assert ok.status_code == 200
+    p = ok.json()["form_data"]["programmes"][0]
+    assert p["level"] == "UG" and p["divisions"] == 4 and p["programme"] == "ENGINEERING_AND_TECHNOLOGY"
+    off = env["login"]("officer@tatva.test")
+    assert api.post(f"/api/v1/applications/{app_id}/verify", headers=off).status_code == 200
+    rules = api.get(f"/api/v1/applications/{app_id}/rule-results", headers=off).json()
+    ratio = next(r for r in rules if r["rule_id"] == "FAC-UG-ENGG-RATIO")
+    assert ratio["status"] == "FAIL"  # 240 seats x 4 years needs 48 faculty; the form still declares 26

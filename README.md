@@ -16,6 +16,14 @@ Why it matters (context, not code): an NGO found 353 teachers listed as full-tim
 
 ## What it does
 
+TatvaAI follows the [feature map](docs/FEATURE_MAP.md): three main features turn a college's yearly application into a ranked list for inspectors.
+
+1. **Handbook rule checker**: faculty, rooms, computers, bandwidth, built-up area and certificate dates against the Handbook; every flag cites its clause and page.
+2. **Document & consistency check**: is each document genuine, and do the facts agree across documents, years and colleges (ghost faculty, expired or edited certificates).
+3. **Risk ranking & officer review**: GREEN / AMBER / RED tiers; the officer accepts or dismisses each flag with a written reason; decision support only.
+
+Supporting features: document sorter, issuer lookup (MOCK), last-year reuse, course & intake settings, evidence viewer, plain-language reasons, rule versions with dry-run, an AI rule-draft helper (a human approves), a hash-chained audit log and a fix-list before submit. Outputs: a ranked inspection list with a PDF on-site checklist for inspectors, a fix-list for colleges.
+
 | | |
 |---|---|
 | **Five engines** | Completeness · Consistency · Authenticity (proof before prediction) · Issuer verification · Compliance (incl. infrastructure evidence) |

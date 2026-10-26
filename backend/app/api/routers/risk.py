@@ -12,6 +12,7 @@ from app.core.db import get_db
 from app.core.security import require_roles
 from app.models import Application, Flag, FlagDecision, Institution, User
 from app.services.audit import hash_chain as audit
+from app.services.features import FEATURE_LABEL, feature_of
 from app.services.risk.inspection import inspection_list
 from app.services.risk.scoring import ROUTING, TIER_LABEL, TIER_RANK, risk_summary, score_application
 
@@ -59,7 +60,7 @@ class InspectionIn(BaseModel):
 
 def flag_out(db: Session, f: Flag) -> dict:
     decisions = db.scalars(select(FlagDecision).where(FlagDecision.flag_id == f.id).order_by(FlagDecision.id)).all()
-    return dict(id=f.id, application_id=f.application_id, engine=f.engine, code=f.code, severity=f.severity, confidence=f.confidence, message=f.message,
+    return dict(id=f.id, application_id=f.application_id, engine=f.engine, feature=feature_of(f.engine), feature_label=FEATURE_LABEL[feature_of(f.engine)], code=f.code, severity=f.severity, confidence=f.confidence, message=f.message,
                 explanation=f.explanation, evidence=json.loads(f.evidence), rule_id=f.rule_id, rule_pack_version=f.rule_pack_version,
                 citation=json.loads(f.citation) if f.citation else None, status=f.status, document_id=f.document_id, forensic=f.forensic,
                 preliminary_indicator=f.forensic, inspection_status=f.inspection_status, inspection_note=f.inspection_note, decisions=[dict(decision=d.decision, reason=d.reason, officer_id=d.officer_id, decided_at=d.decided_at.isoformat()) for d in decisions])
@@ -101,6 +102,7 @@ def stats(user: User = Depends(require_roles(*STAFF)), db: Session = Depends(get
     apps = [a for a in all_apps if a.risk_tier and a.status != "DRAFT" and a.academic_year == latest]
     flags = db.scalars(select(Flag).where(Flag.application_id.in_([a.id for a in apps] or [0]), Flag.severity != "INFO")).all()
     return dict(by_tier={t: sum(a.risk_tier == t for a in apps) for t in ("GREEN", "AMBER", "RED")}, flags_by_engine=dict(Counter(f.engine for f in flags)),
+                flags_by_feature={FEATURE_LABEL[n]: sum(feature_of(f.engine) == n for f in flags) for n in (1, 2)},
                 flags_by_severity=dict(Counter(f.severity for f in flags)), total_applications=len(apps))
 
 
