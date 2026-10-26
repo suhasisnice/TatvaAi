@@ -31,7 +31,8 @@ export default function EvidenceViewer({ target, doc, compare }: { target: Targe
   const [ela, setEla] = useState(false);
   useEffect(() => setEla(false), [target.document_id]);
   const isImage = doc?.content_type?.startsWith("image/");
-  const file = useBlob(isImage || ela ? null : `/documents/${target.document_id}/file`);
+  const isData = !isImage && (doc?.content_type === "text/csv" || /\.csv$/i.test(doc?.filename ?? ""));
+  const file = useBlob(isImage || isData || ela ? null : `/documents/${target.document_id}/file`);
   const heat = useBlob(ela ? `/documents/${target.document_id}/forensics/ela.png` : null);
   const img = useBlob(isImage ? `/documents/${target.document_id}/pages/1.png` : null);
   const other = useBlob(compare ? `/documents/${compare.target.document_id}/pages/1.png` : null);
@@ -51,7 +52,8 @@ export default function EvidenceViewer({ target, doc, compare }: { target: Targe
         <div className="page-wrap" style={{ width: WIDTH }}>
           {ela && heat.url && <img src={heat.url} alt="ELA heatmap" width={WIDTH} />}
           {!ela && isImage && img.url && <img src={img.url} alt={`Photo ${doc?.filename}`} width={WIDTH} />}
-          {!ela && !isImage && file.url && (
+          {!ela && isData && <p className="muted pad">This is a data file (CSV), so it has no page preview. The figures it contributes are explained in the flag details beside it.</p>}
+          {!ela && !isImage && !isData && file.url && (
             <Document file={file.url} onLoadSuccess={(p) => setPages(p.numPages)} loading={<p className="muted pad">Rendering…</p>} error={<p className="err pad">Could not render the PDF.</p>}>
               <Page pageNumber={Math.min(page, pages)} width={WIDTH} renderTextLayer={false} renderAnnotationLayer={false} />
             </Document>
