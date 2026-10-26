@@ -34,7 +34,7 @@ class User(Base):
     id = Column(Integer, primary_key=True)
     email = Column(String, unique=True, nullable=False)
     name = Column(String, nullable=False)
-    role = Column(String, nullable=False)  # institution, officer, inspector, admin
+    role = Column(String, nullable=False)  # institution, officer, inspector
     password_hash = Column(String, nullable=False)
     institution_id = Column(Integer, ForeignKey("institutions.id"), nullable=True)
     totp_secret = Column(String, nullable=True)

@@ -71,5 +71,5 @@ add first.
 4. Split mock issuers into their own service (matches the guide's
    `mock_issuers/` design) so swapping in a real authorised API later is a
    config change, not a code change.
-5. Add the alerts bell + nightly job, and the admin rule-pack editor
+5. Add the alerts bell + nightly job, and the officer-side rule-pack editor (there is no admin role)
    (versioned YAML rules instead of the current Python `engines.py`).

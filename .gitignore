@@ -12,3 +12,4 @@ frontend/dist/
 
 .DS_Store
 *.pyc
+backend/scripts/.tamper_backup.json

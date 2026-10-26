@@ -104,12 +104,11 @@ def main():
     db.commit()
 
     users = [
-        ("inst-aurora@pramaan.test", "Aurora Admin", "institution", "aurora"),
-        ("inst-bhavani@pramaan.test", "Bhavani Admin", "institution", "bhavani"),
-        ("inst-chandra@pramaan.test", "Chandra Admin", "institution", "chandra"),
+        ("inst-aurora@pramaan.test", "Aurora Registrar", "institution", "aurora"),
+        ("inst-bhavani@pramaan.test", "Bhavani Registrar", "institution", "bhavani"),
+        ("inst-chandra@pramaan.test", "Chandra Registrar", "institution", "chandra"),
         ("officer@pramaan.test", "Regulation Bureau Officer", "officer", None),
         ("inspector@pramaan.test", "EVC Inspector", "inspector", None),
-        ("admin@pramaan.test", "Regulation Bureau Admin", "admin", None),
     ]
     for email, name, role, slug in users:
         db.add(User(

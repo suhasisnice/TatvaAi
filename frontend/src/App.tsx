@@ -7,6 +7,7 @@ import MyApplications from "./pages/institution/MyApplications";
 import ApplicationDetail from "./pages/institution/ApplicationDetail";
 import Queue from "./pages/officer/Queue";
 import Workbench from "./pages/officer/Workbench";
+import AuditLog from "./pages/officer/AuditLog";
 import InspectionList from "./pages/inspector/InspectionList";
 
 export default function App() {
@@ -38,10 +39,11 @@ export default function App() {
               <Route path="*" element={<Navigate to="/institution" />} />
             </>
           )}
-          {(session.role === "officer" || session.role === "admin") && (
+          {session.role === "officer" && (
             <>
               <Route path="/officer" element={<Queue />} />
               <Route path="/officer/applications/:id" element={<Workbench />} />
+              <Route path="/officer/audit" element={<AuditLog />} />
               <Route path="*" element={<Navigate to="/officer" />} />
             </>
           )}

@@ -1,3 +1,4 @@
+import { NavLink } from "react-router-dom";
 import { ShieldCheck, LogOut } from "lucide-react";
 import { api } from "../lib/api";
 import type { Session } from "../lib/api";
@@ -20,6 +21,12 @@ export default function Shell({ session, children }: { session: Session; childre
             <small>PramaanAI &mdash; AICTE application validation prototype</small>
           </div>
         </div>
+        {session.role === "officer" && (
+          <nav className="nav">
+            <NavLink to="/officer" end>Review queue</NavLink>
+            <NavLink to="/officer/audit">Audit log</NavLink>
+          </nav>
+        )}
         <div className="right">
           <span className="role-pill">{session.role}</span>
           <span>{session.name}</span>

@@ -63,7 +63,7 @@ def get_application(app_id: int, user: User = Depends(get_current_user), db: Ses
     flags = db.query(Flag).filter(Flag.application_id == app_id).order_by(Flag.severity.desc()).all()
     verifications = db.query(Verification).filter(Verification.application_id == app_id).all()
 
-    show_forensics = user.role in ("officer", "inspector", "admin")
+    show_forensics = user.role in ("officer", "inspector")
 
     return {
         **_serialize_application(app_obj),
@@ -183,7 +183,7 @@ def submit_application(app_id: int, user: User = Depends(require_roles("institut
 
 
 @router.post("/{app_id}/reopen")
-def reopen_application(app_id: int, user: User = Depends(require_roles("admin")), db: Session = Depends(get_db)):
+def reopen_application(app_id: int, user: User = Depends(require_roles("officer")), db: Session = Depends(get_db)):
     app_obj = db.query(Application).get(app_id)
     if not app_obj:
         raise HTTPException(status_code=404, detail="Not found")
@@ -197,7 +197,7 @@ def reopen_application(app_id: int, user: User = Depends(require_roles("admin"))
 
 
 @router.post("/{app_id}/revalidate")
-def revalidate(app_id: int, user: User = Depends(require_roles("officer", "admin")), db: Session = Depends(get_db)):
+def revalidate(app_id: int, user: User = Depends(require_roles("officer")), db: Session = Depends(get_db)):
     app_obj = db.query(Application).get(app_id)
     if not app_obj:
         raise HTTPException(status_code=404, detail="Not found")
@@ -206,7 +206,7 @@ def revalidate(app_id: int, user: User = Depends(require_roles("officer", "admin
 
 
 @router.post("/flags/{flag_id}/decision")
-def decide_flag(flag_id: int, body: FlagDecisionIn, user: User = Depends(require_roles("officer", "admin")),
+def decide_flag(flag_id: int, body: FlagDecisionIn, user: User = Depends(require_roles("officer")),
                  db: Session = Depends(get_db)):
     if body.decision not in ("ACCEPT", "DISMISS"):
         raise HTTPException(status_code=400, detail="decision must be ACCEPT or DISMISS")
@@ -236,7 +236,7 @@ def decide_flag(flag_id: int, body: FlagDecisionIn, user: User = Depends(require
 
 
 @router.post("/flags/{flag_id}/inspection")
-def inspect_flag(flag_id: int, body: InspectionDecisionIn, user: User = Depends(require_roles("inspector", "admin")),
+def inspect_flag(flag_id: int, body: InspectionDecisionIn, user: User = Depends(require_roles("inspector")),
                   db: Session = Depends(get_db)):
     """The EVC's own on-site verdict on a flagged item -- separate from the
     officer's accept/dismiss, which only screens findings before a visit."""
@@ -258,7 +258,7 @@ def inspect_flag(flag_id: int, body: InspectionDecisionIn, user: User = Depends(
 
 
 @router.post("/verifications/{verification_id}/manual")
-def manual_verification(verification_id: int, note: str, user: User = Depends(require_roles("officer", "admin")),
+def manual_verification(verification_id: int, note: str, user: User = Depends(require_roles("officer")),
                          db: Session = Depends(get_db)):
     if len(note.strip()) < 5:
         raise HTTPException(status_code=400, detail="Note must be at least 5 characters")
