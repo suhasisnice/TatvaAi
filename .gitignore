@@ -12,3 +12,4 @@ storage/
 frontend/dist/
 *.sqlite
 *.db-journal
+*.log
