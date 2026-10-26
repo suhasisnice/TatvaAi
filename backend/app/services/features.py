@@ -1,4 +1,4 @@
-"""The product's feature map (docs/FEATURE_MAP.md): the five checking engines roll up into two checking features.
+"""The product's feature map: the five checking engines roll up into two checking features.
 
   Feature 1  Handbook rule checker          faculty, rooms, computers, bandwidth, built-up area, certificate dates
   Feature 2  Document & consistency check   genuine? do the facts agree? across documents, years and colleges
