@@ -32,7 +32,7 @@ export function SeverityChip({ severity }: { severity: string }) {
   return <span className={`chip ${cls}`}>{severity}</span>;
 }
 
-/** The feature map (docs/FEATURE_MAP.md): the five engines roll up into two checking features. */
+/** The feature map: the five engines roll up into two checking features. */
 export const FEATURES: Record<number, string> = { 1: "Feature 1 · Handbook rule checker", 2: "Feature 2 · Document & consistency check" };
 
 export const MockTag = () => <span className="mock" title="Simulated external system">MOCK</span>;

@@ -13,3 +13,4 @@ frontend/dist/
 *.sqlite
 *.db-journal
 *.log
+reports/
