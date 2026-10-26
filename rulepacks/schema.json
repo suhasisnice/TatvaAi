@@ -1,0 +1,44 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "PramaanAI rule file (norms.yaml, documents.yaml, timelines.yaml)",
+  "type": "object",
+  "required": ["pack", "version", "rules"],
+  "properties": {
+    "pack": { "type": "string" },
+    "version": { "type": "string" },
+    "effective_from": { "type": "string" },
+    "academic_year_start": { "type": "string" },
+    "rules": { "type": "array", "items": { "$ref": "#/$defs/rule" } }
+  },
+  "$defs": {
+    "citation": {
+      "type": "object",
+      "required": ["source", "clause", "page"],
+      "properties": {
+        "source": { "type": "string" },
+        "clause": { "type": "string" },
+        "page": { "type": "integer", "description": "PRINTED page; PDF page = printed + 16" }
+      }
+    },
+    "rule": {
+      "type": "object",
+      "required": ["id", "title", "type", "code", "severity", "message", "citation"],
+      "properties": {
+        "id": { "type": "string", "pattern": "^[A-Z0-9-]+$" },
+        "title": { "type": "string" },
+        "type": {
+          "enum": ["document_required", "field_required", "expiry", "formula", "timeline", "consistency", "threshold"]
+        },
+        "applies_to": { "type": "object" },
+        "when": { "type": "string" },
+        "let": { "type": "object", "additionalProperties": { "type": "string" } },
+        "check": { "type": "string", "description": "simpleeval expression; true = PASS" },
+        "code": { "type": "string", "description": "flag code raised on FAIL" },
+        "severity": { "enum": ["CRITICAL", "MAJOR", "MINOR", "INFO"] },
+        "message": { "type": "string" },
+        "citation": { "$ref": "#/$defs/citation" }
+      },
+      "additionalProperties": true
+    }
+  }
+}

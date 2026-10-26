@@ -1,0 +1,15 @@
+# Scoring: contribution = weight(severity) x (confidence if forensic else 1); dismissed flags excluded.
+weights: { CRITICAL: 40, MAJOR: 15, MINOR: 5, INFO: 0 }
+forensic_codes: [TAMPER_SUSPECTED, METADATA_ANOMALY, DUPLICATE_PHOTO, PHOTO_GPS_OFFSITE, BUILDING_NOT_VISIBLE_ON_DATE]
+tiers:
+  RED: { any_severity: CRITICAL, score_at_least: 60, routing: INSPECTION_LIST }
+  AMBER: { any_severity: MAJOR, score_at_least: 20, routing: FIX_LIST }
+  GREEN: { routing: FAST_TRACK }
+top_reasons: 6
+thresholds:
+  photo_gps_radius_km: 1
+  built_up_deviation: 0.15
+  cross_year_change: 0.10
+  name_similarity: 0.9
+  expiry_alert_days: 60
+  pending_alert_days: 7

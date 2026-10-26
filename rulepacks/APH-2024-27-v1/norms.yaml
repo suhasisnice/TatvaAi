@@ -1,0 +1,30 @@
+# SAMPLE pack: two real-shaped rules to freeze the layout. Verify every clause/page against the official APH PDF before demo.
+pack: APH-2024-27
+version: v1
+effective_from: "2026-11-01"
+academic_year_start: "2027-08-01"
+rules:
+  - id: FAC-UG-ENGG-RATIO
+    title: Faculty-student ratio, UG Engineering (1:20)
+    type: formula
+    applies_to: { programme: ENGINEERING_AND_TECHNOLOGY, level: UG }
+    let:
+      S: sum_approved_intake_all_years
+      base_required: "ceil(S / 20)"
+      relief: "0.25 if avg_admitted_3yr <= 0.5 * avg_sanctioned_3yr else 0"
+      required: "ceil(base_required * (1 - relief))"
+    check: "valid_full_time_faculty >= required"
+    code: NORM_FACULTY_SHORTFALL
+    severity: MAJOR
+    message: "Faculty required {required}, valid full-time faculty {valid_full_time_faculty}"
+    citation: { source: "APH 2024-27", clause: "Annexure-5, 5.2 (UG 1:20)", page: 95 }
+
+  - id: EXP-FIRE-AY
+    title: Fire safety certificate valid on the academic-year start date
+    type: expiry
+    applies_to: { document: FIRE_SAFETY_CERTIFICATE }
+    check: "valid_till >= academic_year_start"
+    code: DOC_EXPIRES_BEFORE_AY
+    severity: MAJOR
+    message: "Fire certificate valid till {valid_till}, before the academic year starts on {academic_year_start}"
+    citation: { source: "APH 2024-27", clause: "Annexure-2, 2.1, EoA document list", page: 81 }
