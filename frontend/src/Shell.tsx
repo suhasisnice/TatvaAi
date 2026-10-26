@@ -1,7 +1,8 @@
-import { Bell, LogOut, ShieldCheck } from "lucide-react";
+import { Bell, LogOut } from "lucide-react";
 import { ReactNode, useEffect, useRef, useState } from "react";
-import { Link, NavLink, useNavigate } from "react-router-dom";
-import { api, J, post, User } from "./api";
+import { Link, useNavigate } from "react-router-dom";
+import { api, HOME, J, post, User } from "./api";
+import { Masthead, MenuBar, SiteFooter, UtilBar } from "./components/Masthead";
 import { fmtDate, SeverityChip } from "./ui";
 
 const NAV: Record<string, [string, string][]> = {
@@ -51,17 +52,17 @@ function Bell_({ user }: { user: User }) {
 export default function Shell({ user, onLogout, children }: { user: User; onLogout: () => void; children: ReactNode }) {
   return (
     <>
-      <header className="top">
-        <Link to="/" className="brand"><ShieldCheck size={20} aria-hidden /> TatvaAI</Link>
-        <nav aria-label="Main">{NAV[user.role].map(([to, label]) => <NavLink key={to} to={to} end={to.split("/").length <= 2}>{label}</NavLink>)}</nav>
-        <span className="spacer" />
+      <UtilBar>
         <Bell_ user={user} />
         <Link to="/security" className="who" title="Security settings">{user.name} · {user.role}</Link>
-        <button className="icon-btn" onClick={onLogout} aria-label="Log out"><LogOut size={18} aria-hidden /></button>
-      </header>
-      {user.role !== "institution" && <div className="banner" role="note">Decision support only. Final decisions rest with competent AICTE authorities.</div>}
-      {user.role === "officer" && !user.mfa_enabled && <div className="banner warn" role="note">Two-factor authentication is not enabled for your account. <Link to="/security">Set it up</Link>.</div>}
-      <main>{children}</main>
+        <button className="portal-btn" onClick={onLogout}><LogOut size={14} aria-hidden /> Log out</button>
+      </UtilBar>
+      <Masthead />
+      <MenuBar home={HOME[user.role]} items={NAV[user.role]} />
+      {user.role !== "institution" && <div className="banner" role="note"><div className="wrap">Decision support only. Final decisions rest with competent AICTE authorities.</div></div>}
+      {user.role === "officer" && !user.mfa_enabled && <div className="banner warn" role="note"><div className="wrap">Two-factor authentication is not enabled for your account. <Link to="/security">Set it up</Link>.</div></div>}
+      <main id="main" className="wrap">{children}</main>
+      <SiteFooter />
     </>
   );
 }

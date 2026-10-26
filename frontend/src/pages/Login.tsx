@@ -1,5 +1,6 @@
 import { FormEvent, useState } from "react";
 import { login, User } from "../api";
+import { Masthead, SiteFooter, UtilBar } from "../components/Masthead";
 
 const DEMO = ["inst-a", "inst-b", "inst-c", "officer", "inspector"].map((u) => `${u}@tatva.test`);
 
@@ -23,15 +24,23 @@ export default function Login({ onLogin }: { onLogin: (u: User) => void }) {
   }
 
   return (
-    <form className="card login" onSubmit={submit}>
-      <h1>TatvaAI</h1>
-      <p className="muted">Verified disclosure for AICTE approvals. Prototype with synthetic data only.</p>
-      <label>Email<input value={email} onChange={(e) => setEmail(e.target.value)} autoFocus required list="demo-users" autoComplete="username" /></label>
-      <datalist id="demo-users">{DEMO.map((d) => <option key={d} value={d} />)}</datalist>
-      <label>Password<input type="password" value={password} onChange={(e) => setPassword(e.target.value)} required autoComplete="current-password" /></label>
-      {needOtp && <label>Authenticator code<input value={otp} onChange={(e) => setOtp(e.target.value)} inputMode="numeric" autoFocus autoComplete="one-time-code" /></label>}
-      {error && <p role="alert" className="err">{error}</p>}
-      <button type="submit" className="primary">Sign in</button>
-    </form>
+    <>
+      <UtilBar />
+      <Masthead />
+      <div className="menubar-rule" />
+      <main id="main" className="wrap">
+        <form className="card login" onSubmit={submit}>
+          <h1>Sign in</h1>
+          <p className="muted">Verified disclosure for AICTE approvals. Prototype with synthetic data only.</p>
+          <label>Email<input value={email} onChange={(e) => setEmail(e.target.value)} autoFocus required list="demo-users" autoComplete="username" /></label>
+          <datalist id="demo-users">{DEMO.map((d) => <option key={d} value={d} />)}</datalist>
+          <label>Password<input type="password" value={password} onChange={(e) => setPassword(e.target.value)} required autoComplete="current-password" /></label>
+          {needOtp && <label>Authenticator code<input value={otp} onChange={(e) => setOtp(e.target.value)} inputMode="numeric" autoFocus autoComplete="one-time-code" /></label>}
+          {error && <p role="alert" className="err">{error}</p>}
+          <button type="submit" className="primary">Sign in</button>
+        </form>
+      </main>
+      <SiteFooter />
+    </>
   );
 }

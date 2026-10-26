@@ -42,8 +42,9 @@ beforeEach(() => {
 afterEach(() => { cleanup(); vi.unstubAllGlobals(); });
 
 test("login form renders", () => {
-  render(<Login onLogin={() => {}} />);
-  expect(screen.getByText("Sign in")).toBeTruthy();
+  render(<MemoryRouter><Login onLogin={() => {}} /></MemoryRouter>);
+  expect(screen.getByRole("heading", { name: "Sign in" })).toBeTruthy();
+  expect(screen.getByRole("button", { name: "Sign in" })).toBeTruthy();
 });
 
 test("officer queue lists applications with text-labelled risk tiers, highest first", async () => {

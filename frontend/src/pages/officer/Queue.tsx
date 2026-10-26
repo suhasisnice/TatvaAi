@@ -42,7 +42,7 @@ export default function Queue() {
         <figure className="card chart" aria-label="Findings by feature">
           <figcaption>Findings by feature</figcaption>
           <ResponsiveContainer width="100%" height={200}>
-            <BarChart data={byFeature}><CartesianGrid strokeDasharray="3 3" /><XAxis dataKey="feature" fontSize={12} /><YAxis allowDecimals={false} /><Tooltip /><Bar dataKey="count" name="Findings" fill="#1F3864" /></BarChart>
+            <BarChart data={byFeature}><CartesianGrid strokeDasharray="3 3" /><XAxis dataKey="feature" fontSize={12} /><YAxis allowDecimals={false} /><Tooltip /><Bar dataKey="count" name="Findings" fill="#005aaa" /></BarChart>
           </ResponsiveContainer>
         </figure>
       </div>
