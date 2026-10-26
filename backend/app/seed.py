@@ -11,7 +11,7 @@ from app.core.security import hash_password
 from app.models import (
     Institution, User, Application, Document, IssuerRecord, FacultyRegistryEntry,
 )
-from app.services import extraction, pipeline
+from app.services import extraction, pipeline, alerts
 from app.services.generate_docs import generate_all, DATA_DIR
 
 DEMO_PASSWORD = "Pramaan@2026"
@@ -152,6 +152,7 @@ def main():
             app_obj.status = "SUBMITTED"
             app_obj.submitted_at = datetime.utcnow()
             db.commit()
+            alerts.generate_alerts(db, app_obj)
 
     db.close()
     print("Seed complete. Demo users (password Pramaan@2026):")

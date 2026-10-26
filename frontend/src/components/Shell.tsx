@@ -2,6 +2,7 @@ import { NavLink } from "react-router-dom";
 import { ShieldCheck, LogOut } from "lucide-react";
 import { api } from "../lib/api";
 import type { Session } from "../lib/api";
+import AlertBell from "./AlertBell";
 
 export default function Shell({ session, children }: { session: Session; children: React.ReactNode }) {
   const showBanner = session.role !== "institution";
@@ -28,6 +29,7 @@ export default function Shell({ session, children }: { session: Session; childre
           </nav>
         )}
         <div className="right">
+          <AlertBell role={session.role} />
           <span className="role-pill">{session.role}</span>
           <span>{session.name}</span>
           <button className="logout" onClick={logout}><LogOut size={14} /> Log out</button>

@@ -5,7 +5,7 @@ from PIL import Image
 from sqlalchemy.orm import Session
 
 from app.models import Application, Document, Flag, Verification, IssuerRecord
-from app.services import engines, scoring, audit
+from app.services import engines, scoring, audit, alerts
 
 
 def _phash(path: Path) -> imagehash.ImageHash | None:
@@ -110,6 +110,7 @@ def run_pipeline(db: Session, application: Application, actor: str = "system") -
     application.top_reasons = top_reasons
     db.commit()
     db.refresh(application)
+    alerts.generate_alerts(db, application)
 
     audit.record(db, actor, "pipeline.run", f"application:{application.id}",
                  {"score": score, "tier": tier, "flag_count": len(scoring_flags)})
