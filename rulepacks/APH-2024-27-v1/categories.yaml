@@ -1,0 +1,37 @@
+# Adding a category = adding an entry here (document rules are generated). 3 of the 17 Chapter II categories are wired for the prototype.
+categories:
+  EOA:
+    title: Extension of Approval (self-disclosure)
+    processing:
+      scrutiny_committee: false
+      evc: false
+      citation: { source: "APH 2024-27", clause: "Table 2.3", page: 30 }
+    documents:
+      - { type: AFFIDAVIT_2, requires: [dsc_valid, estamp_value_100], severity: CRITICAL, citation: { source: "APH 2024-27", clause: "Annexure-2, 2.1 (i)", page: 81 } }
+      - { type: TER_RECEIPT, requires: [dsc_valid], severity: CRITICAL, citation: { source: "APH 2024-27", clause: "Annexure-2, 2.1 (ii)", page: 81 } }
+      - { type: OCCUPANCY_CERTIFICATE, requires: [dsc_valid], severity: CRITICAL, citation: { source: "APH 2024-27", clause: "Annexure-2, 2.1 (iii)", page: 81 } }
+      - { type: STRUCTURAL_STABILITY_CERTIFICATE, requires: [dsc_valid], when: "max_building_age_years > 30", severity: CRITICAL, citation: { source: "APH 2024-27", clause: "Annexure-2, 2.1 (iv)", page: 81 } }
+      - { type: FIRE_SAFETY_CERTIFICATE, requires: [dsc_valid], severity: CRITICAL, citation: { source: "APH 2024-27", clause: "Annexure-2, 2.1 (v)", page: 81 } }
+      - { type: SATELLITE_MAP, requires: [dsc_valid], severity: MAJOR, citation: { source: "APH 2024-27", clause: "Annexure-2, 2.1 (vi)", page: 81 } }
+      - { type: AUDITED_ACCOUNTS, requires: [dsc_valid], severity: MAJOR, citation: { source: "APH 2024-27", clause: "Annexure-2, 2.1 (vii)", page: 81 } }
+      - { type: FACULTY_LIST, requires: [], severity: MAJOR, citation: { source: "APH 2024-27", clause: "Clause 6.14 (c); Affidavit-2 item 9 (faculty data on portal)", page: 55 } }
+      - { type: INFRA_PHOTO, requires: [], severity: MINOR, citation: { source: "APH 2024-27", clause: "Clause 1.9 (f)-(g) (EVC video incl. GPS at main entrance)", page: 8 } }
+  INCREASE_IN_INTAKE:
+    title: Increase in intake
+    inherits: EOA
+    processing:
+      scrutiny_committee: true
+      evc: true
+      citation: { source: "APH 2024-27", clause: "Table 2.3", page: 30 }
+    documents:
+      - { type: AFFIDAVIT_8, requires: [dsc_valid], severity: MAJOR, citation: { source: "APH 2024-27", clause: "Annexure-2, 2.6 (i)", page: 82 } }
+      - { type: TRUST_RESOLUTION, requires: [dsc_valid], severity: MAJOR, citation: { source: "APH 2024-27", clause: "Annexure-2, 2.6 (iii), Format 3", page: 82 } }
+  NAME_CHANGE_INSTITUTION:
+    title: Change of name of the institution
+    processing:
+      scrutiny_committee: true
+      evc: false
+      citation: { source: "APH 2024-27", clause: "Table 2.3", page: 30 }
+    documents:
+      - { type: NOC_AFFILIATING_UNIVERSITY, requires: [dsc_valid], severity: MAJOR, citation: { source: "APH 2024-27", clause: "Annexure-2, 2.10 (i), Format 2", page: 83 } }
+      - { type: TRUST_RESOLUTION, requires: [dsc_valid], severity: MAJOR, citation: { source: "APH 2024-27", clause: "Annexure-2, 2.10 (ii), Format 3", page: 83 } }

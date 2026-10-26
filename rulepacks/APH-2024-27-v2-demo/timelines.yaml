@@ -1,0 +1,114 @@
+constants:
+  submission_deadline: "2027-03-31"   # demo deadline for AY 2027-28; DSC signing after this is impossible
+rules:
+  - id: TL-ESTAMP-BEFORE-NOTARY
+    title: E-stamp must be issued on or before the date the affidavit was notarised
+    applies_to: { category: EOA }
+    when: "has_affidavit"
+    type: timeline
+    check: "affidavit_estamp_issue_date <= affidavit_notarisation_date"
+    evidence: [{ document_type: AFFIDAVIT_2, fields: [estamp_issue_date, notarisation_date] }]
+    code: TIMELINE_IMPOSSIBLE
+    severity: MAJOR
+    message: "E-stamp issued {affidavit_estamp_issue_date} but the affidavit was notarised {affidavit_notarisation_date}"
+    citation: { source: "APH 2024-27", clause: "Annexure-2 (i)", page: 81 }
+
+  - id: TL-FIRE-AFTER-COMPLETION
+    title: Fire certificate cannot predate completion of the first building
+    applies_to: { category: EOA }
+    when: "has_fire and has_buildings"
+    type: timeline
+    check: "fire_issue_date >= earliest_completion_date"
+    evidence: [{ document_type: FIRE_SAFETY_CERTIFICATE, fields: [issue_date] }, { document_type: OCCUPANCY_CERTIFICATE, fields: [completion_date] }]
+    code: TIMELINE_IMPOSSIBLE
+    severity: MAJOR
+    message: "Fire certificate issued {fire_issue_date}, before building completion {earliest_completion_date}"
+    citation: { source: "APH 2024-27", clause: "Annexure-3, 3.1 (d)", page: 86 }
+
+  - id: TL-DSC-BEFORE-DEADLINE
+    title: Documents cannot be digitally signed after the submission deadline
+    applies_to: { category: EOA }
+    when: "submission_deadline"
+    type: timeline
+    check: "latest_signed_date <= submission_deadline"
+    code: TIMELINE_IMPOSSIBLE
+    severity: MAJOR
+    message: "A document was signed {latest_signed_date}, after the deadline {submission_deadline}"
+    citation: { source: "APH 2024-27", clause: "Clause 2.2 (b) (last date); DSC upload per Clause 2.3.4 (a) p.15", page: 12 }
+
+  - id: TL-PROVISIONAL-OC-LIMIT
+    title: Provisional occupancy certificate is accepted for 2 consecutive academic years only
+    applies_to: { category: EOA }
+    when: "uses_provisional_oc"
+    type: threshold
+    let: { years_used: "provisional_oc_consecutive_years" }
+    check: "years_used <= 2"
+    evidence: [{ document_type: OCCUPANCY_CERTIFICATE, fields: [certificate_type, building_name], where: { certificate_type: PROVISIONAL } }]
+    code: PROVISIONAL_OC_LIMIT_EXCEEDED
+    severity: MAJOR
+    message: "Provisional occupancy certificate used for {years_used} consecutive academic years (limit 2)"
+    citation: { source: "APH 2024-27", clause: "Annexure-3, 3.1 (c)", page: 86 }
+
+  - id: CONS-INSTITUTION-NAME
+    title: Institution name must agree across documents and the application form
+    applies_to: { category: EOA }
+    type: consistency
+    attribute: institution_name
+    sources:
+      - { document_type: AFFIDAVIT_2, field: institution_name }
+      - { document_type: TER_RECEIPT, field: institution_name }
+      - { document_type: OCCUPANCY_CERTIFICATE, field: institution_name }
+      - { document_type: STRUCTURAL_STABILITY_CERTIFICATE, field: institution_name }
+      - { document_type: FIRE_SAFETY_CERTIFICATE, field: institution_name }
+      - { document_type: SATELLITE_MAP, field: institution_name }
+    reference: "institution.name"
+    threshold: 0.9
+    code: MISMATCH_CROSS_DOC
+    severity: MAJOR
+    message: "Institution name differs from the application form: {mismatches}"
+    citation: { source: "APH 2024-27", clause: "Clause 2.3.3 (a) (data entered must be correct)", page: 14 }
+
+  - id: CONS-TRUST-NAME
+    title: Trust/Society name must agree across documents and the application form
+    applies_to: { category: EOA }
+    type: consistency
+    attribute: trust_name
+    sources:
+      - { document_type: AFFIDAVIT_2, field: trust_name }
+      - { document_type: LAND_DOCUMENT, field: owner_name }
+      - { document_type: AUDITED_ACCOUNTS, field: entity_name }
+    reference: "institution.trust_name"
+    threshold: 0.9
+    code: MISMATCH_CROSS_DOC
+    severity: MAJOR
+    message: "Trust name differs from the application form: {mismatches}"
+    citation: { source: "APH 2024-27", clause: "Annexure-2 (vii)", page: 81 }
+
+  - id: CONS-SURVEY-NO
+    title: Survey number must agree across land and occupancy documents and the form
+    applies_to: { category: EOA }
+    type: consistency
+    attribute: survey_no
+    sources:
+      - { document_type: LAND_DOCUMENT, field: survey_no }
+      - { document_type: OCCUPANCY_CERTIFICATE, field: survey_no }
+    reference: "institution.survey_no"
+    threshold: 1.0
+    code: MISMATCH_CROSS_DOC
+    severity: MAJOR
+    message: "Survey number differs from the application form: {mismatches}"
+    citation: { source: "APH 2024-27", clause: "Affidavit-2, item 15 (land details true and complete)", page: 186 }
+
+  - id: CONS-SIGNATORY
+    title: Affidavit signatory must match the application form
+    applies_to: { category: EOA }
+    type: consistency
+    attribute: signatory_name
+    sources:
+      - { document_type: AFFIDAVIT_2, field: signatory_name }
+    reference: "signatory.name"
+    threshold: 0.9
+    code: MISMATCH_CROSS_DOC
+    severity: MINOR
+    message: "Signatory differs from the application form: {mismatches}"
+    citation: { source: "APH 2024-27", clause: "Annexure-2 (i)", page: 81 }

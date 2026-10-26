@@ -1,0 +1,36 @@
+name: CI
+on: [push, pull_request]
+
+jobs:
+  backend:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.11", cache: pip, cache-dependency-path: backend/requirements.txt }
+      - run: sudo apt-get update && sudo apt-get install -y libzbar0
+      - run: pip install -r backend/requirements.txt
+      - run: python -m pytest tests -q
+      - name: Every planted flag is caught (A GREEN, B AMBER, C RED)
+        run: python scripts/verify_planted.py
+      - name: Evaluation report
+        run: python scripts/evaluate.py
+      - uses: actions/upload-artifact@v4
+        with: { name: evaluation, path: reports/evaluation.md }
+
+  frontend:
+    runs-on: ubuntu-latest
+    defaults: { run: { working-directory: frontend } }
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 22, cache: npm, cache-dependency-path: frontend/package-lock.json }
+      - run: npm ci
+      - run: npm run build
+      - run: npm test
+
+  compose:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: docker compose config -q

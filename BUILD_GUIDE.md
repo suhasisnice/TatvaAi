@@ -13,13 +13,13 @@ Tiers: **P0** = demo dies without it. **P1** = makes the demo strong. **P2** = o
 ### A. Application and documents (institution side)
 | # | Feature | Tier |
 |---|---|---|
-| A1 | Login with 4 roles: institution, officer, inspector, admin (JWT, bcrypt, role check on every route) | P0 |
+| A1 | Login with 3 roles: institution, officer, inspector (JWT, bcrypt, role check on every route) | P0 |
 | A2 | Create application (academic year + category: EoA, increase in intake, name change) | P0 |
 | A3 | Per-category checklist of required documents (from YAML) | P0 |
 | A4 | Upload PDF/JPG/PNG/CSV: type/size/magic-byte check, SHA-256, stored | P0 |
 | A5 | Auto-classify the document and say it back ("recognised as FIRE SAFETY CERTIFICATE, 97%") | P0 |
 | A6 | Pre-check: plain-language fix-list (Must fix / Should fix / Minor) with "how to fix" and Handbook clause | P0 |
-| A7 | Submit locks the application; admin can reopen once | P1 |
+| A7 | Submit locks the application; officer can reopen once | P1 |
 | A8 | Pre-fill from last year's application | P2 |
 
 ### B. Document intelligence
@@ -60,9 +60,9 @@ Each flag has: code, engine, severity (CRITICAL/MAJOR/MINOR/INFO), confidence 0 
 | E2 | **Rule Pack**: Handbook norms as versioned YAML with clause and page; safe evaluation with `simpleeval`; PASS / FAIL / INSUFFICIENT_EVIDENCE | P0 |
 | E3 | Risk score and tier with top reasons (weights from the `risk` YAML) | P0 |
 | E4 | Ranked inspection list (RED first) with "why this institution" and an on-site checklist | P0 |
-| E5 | Admin rule editor: validate, dry-run (risk now vs under draft), activate | P1 |
+| E5 | Officer rule editor: validate, dry-run (risk now vs under draft), activate | P1 |
 
-### F. Officer, inspector, admin screens
+### F. Officer and inspector screens
 | # | Feature | Tier |
 |---|---|---|
 | F1 | Review queue: KPI cards, tier chart, filters, sorted RED first | P0 |
@@ -81,7 +81,7 @@ Each flag has: code, engine, severity (CRITICAL/MAJOR/MINOR/INFO), confidence 0 
 | G1 | Role-based access; institutions see only their own data | P0 |
 | G2 | Hash-chained audit log with a "verify chain" button | P0 |
 | G3 | Document access log (who viewed what) | P1 |
-| G4 | MFA (TOTP) for officer and admin | P2 |
+| G4 | MFA (TOTP) for officer | P2 |
 | G5 | Synthetic data only; every external system labelled `"mock": true` | P0 |
 
 ---
@@ -150,7 +150,7 @@ Integration breaks when two people guess each other's interfaces. Fix the interf
 | Mock issuers + adapters | Institution pages: applications, upload, pre-check fix-list |
 | Evidence graph, rule pack loader, the 5 engines | Officer queue and workbench (4 tabs first) |
 | Risk scoring, inspection list | Evidence viewer with highlighted box |
-| Synthetic generator, test PKI, `verify_planted`, `evaluate` | Inspector page, admin audit/rules, map |
+| Synthetic generator, test PKI, `verify_planted`, `evaluate` | Inspector page, officer audit/rules, map |
 | Report PDFs, audit hash chain | Demo script, slides, Q&A, UI polish |
 
 ---

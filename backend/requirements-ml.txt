@@ -1,0 +1,7 @@
+# Optional, installed only with docker build arg INSTALL_ML=true
+paddleocr
+ultralytics
+face-recognition
+transformers
+torch
+sentence-transformers

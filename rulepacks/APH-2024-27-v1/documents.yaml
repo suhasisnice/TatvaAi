@@ -1,0 +1,75 @@
+pack: APH-2024-27
+version: v1
+effective_from: "2026-11-01"
+academic_year_start: "2027-08-01"
+rules:
+  # Document presence rules are generated from categories.yaml. Rules below cover validity and required fields.
+  - id: EXP-FIRE-AY
+    title: Fire safety certificate must be valid on the academic-year start date
+    applies_to: { category: EOA }
+    type: expiry
+    document_type: FIRE_SAFETY_CERTIFICATE
+    field: valid_till
+    valid_on: academic_year_start
+    code: DOC_EXPIRES_BEFORE_AY
+    severity: MAJOR
+    message: "Fire safety certificate is valid only till {valid_till}, before the academic year starts on {valid_on}"
+    citation: { source: "APH 2024-27", clause: "Annexure-2 (v) (valid Fire Safety Certificate)", page: 81 }
+
+  - id: EXP-FIRE-NOW
+    title: Fire safety certificate must be valid at submission
+    applies_to: { category: EOA }
+    type: expiry
+    document_type: FIRE_SAFETY_CERTIFICATE
+    field: valid_till
+    valid_on: submission_date
+    code: DOC_EXPIRED
+    severity: MAJOR
+    message: "Fire safety certificate expired on {valid_till}"
+    citation: { source: "APH 2024-27", clause: "Annexure-2 (v) (valid Fire Safety Certificate)", page: 81 }
+
+  - id: EXP-OC-AY
+    title: Occupancy certificate (if time-limited) must be valid on the academic-year start date
+    applies_to: { category: EOA }
+    type: expiry
+    document_type: OCCUPANCY_CERTIFICATE
+    field: valid_till
+    valid_on: academic_year_start
+    code: DOC_EXPIRES_BEFORE_AY
+    severity: MAJOR
+    message: "Occupancy certificate is valid only till {valid_till}, before the academic year starts on {valid_on}"
+    citation: { source: "APH 2024-27", clause: "Annexure-2 (iii)", page: 81 }
+
+  - id: EXP-STRUCT-AY
+    title: Structural stability certificate must be valid on the academic-year start date
+    applies_to: { category: EOA }
+    type: expiry
+    document_type: STRUCTURAL_STABILITY_CERTIFICATE
+    field: valid_till
+    valid_on: academic_year_start
+    code: DOC_EXPIRES_BEFORE_AY
+    severity: MAJOR
+    message: "Structural stability certificate is valid only till {valid_till}, before the academic year starts on {valid_on}"
+    citation: { source: "APH 2024-27", clause: "Annexure-2 (iv)", page: 81 }
+
+  - id: FIELD-SATMAP-COORDS
+    title: Satellite map must show latitude and longitude of the main building entrance
+    applies_to: { category: EOA }
+    type: field_required
+    document_type: SATELLITE_MAP
+    fields: [latitude, longitude, location_label]
+    code: FIELD_MISSING
+    severity: MAJOR
+    message: "Satellite map is missing {missing}"
+    citation: { source: "APH 2024-27", clause: "Annexure-2 (vi)", page: 81 }
+
+  - id: FIELD-AFFIDAVIT2
+    title: Affidavit 2 must carry e-stamp and notarisation details
+    applies_to: { category: EOA }
+    type: field_required
+    document_type: AFFIDAVIT_2
+    fields: [estamp_cert_no, estamp_issue_date, notarisation_date, signatory_name]
+    code: FIELD_MISSING
+    severity: MAJOR
+    message: "Affidavit 2 is missing {missing}"
+    citation: { source: "APH 2024-27", clause: "Annexure-2 (i)", page: 81 }

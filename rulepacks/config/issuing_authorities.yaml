@@ -1,0 +1,21 @@
+# Competent authorities per state (APH Annexure-14, p. 163). FICTIONAL demo rows for 3 states.
+source: { source: "APH 2024-27", clause: "Annexure-14", page: 163 }
+states:
+  karnataka:
+    land_use_certificate: "Karnataka Urban Development Authority (Synthetic)"
+    site_plan: "Karnataka Town Planning Office (Synthetic)"
+    building_plan: "Karnataka Town Planning Office (Synthetic)"
+    occupancy_certificate: "Karnataka Local Planning Authority (Synthetic)"
+    fire_safety: "Karnataka Fire and Emergency Services (Synthetic)"
+  maharashtra:
+    land_use_certificate: "Maharashtra Regional Planning Board (Synthetic)"
+    site_plan: "Maharashtra Town Planning Department (Synthetic)"
+    building_plan: "Maharashtra Town Planning Department (Synthetic)"
+    occupancy_certificate: "Maharashtra Municipal Planning Authority (Synthetic)"
+    fire_safety: "Maharashtra Fire Services Directorate (Synthetic)"
+  tamilnadu:
+    land_use_certificate: "Tamil Nadu Directorate of Town and Country Planning (Synthetic)"
+    site_plan: "Tamil Nadu Directorate of Town and Country Planning (Synthetic)"
+    building_plan: "Tamil Nadu Local Body Planning Office (Synthetic)"
+    occupancy_certificate: "Tamil Nadu Local Body Planning Office (Synthetic)"
+    fire_safety: "Tamil Nadu Fire and Rescue Services (Synthetic)"

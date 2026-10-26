@@ -1,0 +1,10 @@
+# TER (Technical Education Regulatory) charges, APH 2024-27 Table 2.1 (p. 13), for institutions other than Government/University
+# (Government / Central / State University rates are lower; not used by the synthetic institutions). Charges rise 10% every year (p. 14, note i).
+# EoA on self-disclosure is charged per division of the applied intake (Table 2.1 footnote); the other categories are flat amounts.
+source: { source: "APH 2024-27", clause: "Table 2.1", page: 13 }
+base_year: "2024-25"
+escalation_pct_per_year: 10
+categories:
+  EOA: { per_division: 20000 }                 # Rs 0.20 lakh per division (all programmes except PGDM/MBA)
+  INCREASE_IN_INTAKE: { flat: 125000 }         # Rs 1.25 lakh
+  NAME_CHANGE_INSTITUTION: { flat: 60000 }     # Rs 0.60 lakh

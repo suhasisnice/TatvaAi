@@ -1,129 +1,139 @@
 {
-  "year": "2027-28",
-  "tiers": {
-    "a": "GREEN",
-    "b": "AMBER",
-    "c": "RED"
-  },
-  "flags": [
-    {
-      "institution": "a",
-      "code": "ISSUER_UNAVAILABLE",
-      "severity": "INFO",
-      "planted": true,
-      "note": "#1 Karnataka fire portal down"
-    },
-    {
-      "institution": "b",
-      "code": "DOC_EXPIRES_BEFORE_AY",
-      "severity": "MAJOR",
-      "planted": true,
-      "note": "#2"
-    },
-    {
-      "institution": "b",
-      "code": "PROVISIONAL_OC_LIMIT_EXCEEDED",
-      "severity": "MAJOR",
-      "planted": true,
-      "note": "#3"
-    },
-    {
-      "institution": "c",
-      "code": "MODIFIED_AFTER_SIGNING",
-      "severity": "CRITICAL",
-      "planted": true,
-      "note": "#4"
-    },
-    {
-      "institution": "c",
-      "code": "TAMPER_SUSPECTED",
-      "severity": "CRITICAL",
-      "planted": true,
-      "note": "#5"
-    },
-    {
-      "institution": "c",
-      "code": "ISSUER_MISMATCH",
-      "severity": "MAJOR",
-      "planted": true,
-      "note": "#6"
-    },
-    {
-      "institution": "c",
-      "code": "QR_MISMATCH",
-      "severity": "MAJOR",
-      "planted": true,
-      "note": "#7"
-    },
-    {
-      "institution": "c",
-      "code": "TIMELINE_IMPOSSIBLE",
-      "severity": "MAJOR",
-      "planted": true,
-      "note": "#8"
-    },
-    {
-      "institution": "c",
-      "code": "DUPLICATE_PHOTO",
-      "severity": "MAJOR",
-      "planted": true,
-      "note": "#9"
-    },
-    {
-      "institution": "c",
-      "code": "PHOTO_GPS_OFFSITE",
-      "severity": "MAJOR",
-      "planted": true,
-      "note": "#10"
-    },
-    {
-      "institution": "c",
-      "code": "DUPLICATE_FACULTY_CROSS_INSTITUTION",
-      "severity": "MAJOR",
-      "planted": true,
-      "note": "#11"
-    },
-    {
-      "institution": "c",
-      "code": "NORM_FACULTY_SHORTFALL",
-      "severity": "MAJOR",
-      "planted": true,
-      "note": "#12"
-    },
-    {
-      "institution": "c",
-      "code": "BUILTUP_AREA_IMPLAUSIBLE",
-      "severity": "MAJOR",
-      "planted": true,
-      "note": "#13"
-    },
-    {
-      "institution": "c",
-      "code": "BUILDING_NOT_VISIBLE_ON_DATE",
-      "severity": "MAJOR",
-      "planted": true,
-      "note": "#14"
-    },
-    {
-      "institution": "c",
-      "code": "DISCLOSURE_MISMATCH",
-      "severity": "MAJOR",
-      "planted": true,
-      "note": "#15"
-    },
-    {
-      "institution": "c",
-      "code": "MISMATCH_CROSS_DOC",
-      "severity": "MAJOR",
-      "planted": false,
-      "note": "optional consequence of #4"
-    },
-    {
-      "institution": "b",
-      "code": "ISSUER_UNAVAILABLE",
-      "severity": "INFO",
-      "planted": false,
-      "note": "optional: Maharashtra occupancy has no API"
-    }
+ "academic_year": "2027-28",
+ "a": {
+  "expected_tier": "GREEN",
+  "planted": [
+   {
+    "code": "ISSUER_UNAVAILABLE",
+    "source": "fire_noc:karnataka",
+    "severity": "INFO"
+   }
+  ],
+  "carry_forward": [
+   "LAND_DOCUMENT",
+   "OCCUPANCY_CERTIFICATE"
+  ],
+  "optional": [
+   {
+    "code": "DUPLICATE_PHOTO",
+    "severity": "INFO",
+    "note": "earlier owner of the photo C reused"
+   }
   ]
+ },
+ "b": {
+  "expected_tier": "AMBER",
+  "planted": [
+   {
+    "code": "DOC_EXPIRES_BEFORE_AY",
+    "document_type": "FIRE_SAFETY_CERTIFICATE",
+    "valid_till": "2027-06-30"
+   },
+   {
+    "code": "PROVISIONAL_OC_LIMIT_EXCEEDED",
+    "document_type": "OCCUPANCY_CERTIFICATE",
+    "building": "New Block",
+    "consecutive_years": 3
+   }
+  ],
+  "carry_forward": [],
+  "optional": [
+   {
+    "code": "ISSUER_UNAVAILABLE",
+    "source": "occupancy:maharashtra"
+   }
+  ]
+ },
+ "c": {
+  "expected_tier": "RED",
+  "planted": [
+   {
+    "code": "MODIFIED_AFTER_SIGNING",
+    "document_type": "LAND_DOCUMENT",
+    "field": "survey_no",
+    "original": "SY-118/4B",
+    "edited": "SY-118/9C"
+   },
+   {
+    "code": "TAMPER_SUSPECTED",
+    "document_type": "LAND_DOCUMENT",
+    "severity": "CRITICAL"
+   },
+   {
+    "code": "ISSUER_MISMATCH",
+    "document_type": "LAND_DOCUMENT",
+    "source": "digilocker"
+   },
+   {
+    "code": "QR_MISMATCH",
+    "document_type": "FIRE_SAFETY_CERTIFICATE",
+    "qr_valid_till": "2026-12-31",
+    "printed_valid_till": "2028-12-31"
+   },
+   {
+    "code": "TIMELINE_IMPOSSIBLE",
+    "document_type": "AFFIDAVIT_2",
+    "estamp_issue": "2027-01-20",
+    "notarised": "2027-01-15"
+   },
+   {
+    "code": "DUPLICATE_PHOTO",
+    "document_type": "INFRA_PHOTO",
+    "photo": "lab_1.jpg",
+    "duplicate_of": "a/lab_1.jpg"
+   },
+   {
+    "code": "PHOTO_GPS_OFFSITE",
+    "document_type": "INFRA_PHOTO",
+    "photo": "classroom_1.jpg",
+    "approx_km": 40
+   },
+   {
+    "code": "DUPLICATE_FACULTY_CROSS_INSTITUTION",
+    "source": "aicte_faculty_registry",
+    "count": 12
+   },
+   {
+    "code": "NORM_FACULTY_SHORTFALL",
+    "S": 2400,
+    "required": 120,
+    "declared": 109,
+    "valid": 97,
+    "shortfall": 23,
+    "citation": "Annexure-5, p. 95"
+   },
+   {
+    "code": "BUILTUP_AREA_IMPLAUSIBLE",
+    "declared_m2": 31500,
+    "footprint_m2": 6025,
+    "floors": 4,
+    "expected_m2": 24100
+   },
+   {
+    "code": "BUILDING_NOT_VISIBLE_ON_DATE",
+    "building": "Block C",
+    "completion_year": 2023,
+    "first_seen_year": 2026
+   },
+   {
+    "code": "DISCLOSURE_MISMATCH",
+    "declared_faculty": 109,
+    "website_faculty": 85
+   }
+  ],
+  "carry_forward": [
+   "OCCUPANCY_CERTIFICATE"
+  ],
+  "optional": [
+   {
+    "code": "MISMATCH_CROSS_YEAR",
+    "field": "survey_no"
+   },
+   {
+    "code": "MISMATCH_CROSS_DOC",
+    "field": "survey_no",
+    "document_type": "LAND_DOCUMENT"
+   }
+  ]
+ }
 }

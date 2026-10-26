@@ -1,13 +1,9 @@
-# SAMPLE pack: two real-shaped rules to freeze the layout. Verify every clause/page against the official APH PDF before demo.
-pack: APH-2024-27
-version: v1
-effective_from: "2026-11-01"
-academic_year_start: "2027-08-01"
 rules:
+  # ---- Faculty-student ratio (Annexure-5, pp. 95-96). S = sum of approved intake for all years.
   - id: FAC-UG-ENGG-RATIO
     title: Faculty-student ratio, UG Engineering (1:20)
-    type: formula
     applies_to: { programme: ENGINEERING_AND_TECHNOLOGY, level: UG }
+    type: formula
     let:
       S: sum_approved_intake_all_years
       base_required: "ceil(S / 20)"
@@ -16,15 +12,195 @@ rules:
     check: "valid_full_time_faculty >= required"
     code: NORM_FACULTY_SHORTFALL
     severity: MAJOR
-    message: "Faculty required {required}, valid full-time faculty {valid_full_time_faculty}"
-    citation: { source: "APH 2024-27", clause: "Annexure-5, 5.2 (UG 1:20)", page: 95 }
+    message: "Faculty required {required}, valid full-time faculty {valid_full_time_faculty}, shortfall {required - valid_full_time_faculty}"
+    citation: { source: "APH 2024-27", clause: "Annexure-5, 5.2 (UG 1:20); relief per 5.3 note p.96", page: 95 }
 
-  - id: EXP-FIRE-AY
-    title: Fire safety certificate valid on the academic-year start date
-    type: expiry
-    applies_to: { document: FIRE_SAFETY_CERTIFICATE }
-    check: "valid_till >= academic_year_start"
-    code: DOC_EXPIRES_BEFORE_AY
+  - id: FAC-PG-ENGG-RATIO
+    title: Faculty-student ratio, PG Engineering (1:15)
+    applies_to: { programme: ENGINEERING_AND_TECHNOLOGY, level: PG }
+    type: formula
+    let:
+      S: sum_approved_intake_all_years
+      base_required: "ceil(S / 15)"
+      relief: "0.25 if avg_admitted_3yr <= 0.5 * avg_sanctioned_3yr else 0"
+      required: "ceil(base_required * (1 - relief))"
+    check: "valid_full_time_faculty >= required"
+    code: NORM_FACULTY_SHORTFALL
     severity: MAJOR
-    message: "Fire certificate valid till {valid_till}, before the academic year starts on {academic_year_start}"
-    citation: { source: "APH 2024-27", clause: "Annexure-2, 2.1, EoA document list", page: 81 }
+    message: "Faculty required {required}, valid full-time faculty {valid_full_time_faculty}, shortfall {required - valid_full_time_faculty}"
+    citation: { source: "APH 2024-27", clause: "Annexure-5, 5.3 (PG 1:15)", page: 96 }
+
+  - id: FAC-MCA-MBA-RATIO
+    title: Faculty-student ratio, MCA and MBA/PGDM (1:20)
+    applies_to: { programme: [MCA, MBA_PGDM] }
+    type: formula
+    let:
+      S: sum_approved_intake_all_years
+      base_required: "ceil(S / 20)"
+      relief: "0.25 if avg_admitted_3yr <= 0.5 * avg_sanctioned_3yr else 0"
+      required: "ceil(base_required * (1 - relief))"
+    check: "valid_full_time_faculty >= required"
+    code: NORM_FACULTY_SHORTFALL
+    severity: MAJOR
+    message: "Faculty required {required}, valid full-time faculty {valid_full_time_faculty}, shortfall {required - valid_full_time_faculty}"
+    citation: { source: "APH 2024-27", clause: "Annexure-5, 5.3 (MCA, MBA/PGDM 1:20)", page: 96 }
+
+  - id: FAC-UG-CA-MGMT-RATIO
+    title: Faculty-student ratio, UG Computer Applications and Management (1:25)
+    applies_to: { programme: [COMPUTER_APPLICATIONS, MANAGEMENT], level: UG }
+    type: formula
+    let:
+      S: sum_approved_intake_all_years
+      base_required: "ceil(S / 25)"
+      relief: "0.25 if avg_admitted_3yr <= 0.5 * avg_sanctioned_3yr else 0"
+      required: "ceil(base_required * (1 - relief))"
+    check: "valid_full_time_faculty >= required"
+    code: NORM_FACULTY_SHORTFALL
+    severity: MAJOR
+    message: "Faculty required {required}, valid full-time faculty {valid_full_time_faculty}, shortfall {required - valid_full_time_faculty}"
+    citation: { source: "APH 2024-27", clause: "Annexure-5, 5.2 (UG CA/Management 1:25)", page: 95 }
+
+  - id: FAC-CADRE-ENGG
+    title: "Cadre ratio Professor:Associate:Assistant = 1:2:6, UG Engineering (PG Engineering uses 1:1:1; not for Diploma)"
+    applies_to: { programme: ENGINEERING_AND_TECHNOLOGY, level: UG }
+    type: formula
+    let:
+      min_prof: "ceil(valid_full_time_faculty / 9)"
+      min_assoc: "ceil(2 * valid_full_time_faculty / 9)"
+    check: "valid_professors >= min_prof and valid_associates >= min_assoc"
+    code: NORM_CADRE_RATIO
+    severity: MINOR
+    message: "Cadre ratio 1:2:6 needs {min_prof} professors and {min_assoc} associate professors; found {valid_professors} and {valid_associates}"
+    citation: { source: "APH 2024-27", clause: "Annexure-5, 5.2 (R = 1+2+6) and 5.3 note (cadre 1:2:6)", page: 96 }
+
+  # ---- Rooms and areas (Annexure-3, pp. 87-88)
+  - id: INFRA-CLASSROOMS
+    title: Classrooms = divisions per year x duration x 0.5, 66 sq m each
+    applies_to: { category: EOA }
+    type: formula
+    let: { required: "ceil(divisions_total * max_duration * 0.5)" }
+    check: "classrooms_count >= required and classrooms_area_each_m2 >= 66"
+    code: NORM_ROOMS
+    severity: MAJOR
+    message: "Classrooms required {required} of 66 sq m; declared {classrooms_count} of {classrooms_area_each_m2} sq m"
+    citation: { source: "APH 2024-27", clause: "Annexure-3, 3.2.1 A (Class Rooms)", page: 87 }
+
+  - id: INFRA-TUTORIAL
+    title: Tutorial rooms = 25% of classrooms, 33 sq m each
+    applies_to: { category: EOA }
+    type: formula
+    let: { required: "ceil(0.25 * ceil(divisions_total * max_duration * 0.5))" }
+    check: "tutorial_rooms_count >= required and tutorial_rooms_area_each_m2 >= 33"
+    code: NORM_ROOMS
+    severity: MINOR
+    message: "Tutorial rooms required {required} of 33 sq m; declared {tutorial_rooms_count} of {tutorial_rooms_area_each_m2} sq m"
+    citation: { source: "APH 2024-27", clause: "Annexure-3, 3.2.1 A (Tutorial Rooms)", page: 87 }
+
+  - id: INFRA-LABS
+    title: Laboratories, 66 sq m each (first year 4 labs, then 2 per course per year)
+    applies_to: { category: EOA }
+    type: formula
+    let: { required: "4 + 2 * ncourses_total * 3" }
+    check: "labs_count >= required and labs_area_each_m2 >= 66"
+    code: NORM_ROOMS
+    severity: MAJOR
+    message: "Laboratories required {required} of 66 sq m; declared {labs_count} of {labs_area_each_m2} sq m"
+    citation: { source: "APH 2024-27", clause: "Annexure-3, 3.2.1 A (Laboratories)", page: 87 }
+
+  - id: INFRA-WORKSHOP
+    title: Workshop 200 sq m (1 up to intake 600, +1 for 601-1200)
+    applies_to: { category: EOA }
+    type: formula
+    let: { required: "1 if annual_intake_total <= 600 else 2" }
+    check: "workshop_count >= required and workshop_area_each_m2 >= 200"
+    code: NORM_AREA
+    severity: MINOR
+    message: "Workshops required {required} of 200 sq m; declared {workshop_count} of {workshop_area_each_m2} sq m"
+    citation: { source: "APH 2024-27", clause: "Annexure-3, 3.2.1 A (Workshop)", page: 87 }
+
+  - id: INFRA-COMPUTER-CENTRE
+    title: Computer centre 150 sq m (1 up to intake 600, +1 for 601-1200)
+    applies_to: { category: EOA }
+    type: formula
+    let: { required: "1 if annual_intake_total <= 600 else 2" }
+    check: "computer_centre_count >= required and computer_centre_area_each_m2 >= 150"
+    code: NORM_AREA
+    severity: MINOR
+    message: "Computer centres required {required} of 150 sq m; declared {computer_centre_count} of {computer_centre_area_each_m2} sq m"
+    citation: { source: "APH 2024-27", clause: "Annexure-3, 3.2.1 A (Computer Centre)", page: 88 }
+
+  - id: INFRA-SEMINAR-HALL
+    title: Seminar hall 132 sq m
+    applies_to: { category: EOA }
+    type: formula
+    check: "seminar_hall_count >= 1 and seminar_hall_area_each_m2 >= 132"
+    code: NORM_AREA
+    severity: MINOR
+    message: "Seminar hall of 132 sq m required; declared {seminar_hall_count} of {seminar_hall_area_each_m2} sq m"
+    citation: { source: "APH 2024-27", clause: "Annexure-3, 3.2.1 A (Seminar Hall)", page: 88 }
+
+  - id: INFRA-LIBRARY
+    title: Library 400 sq m
+    applies_to: { category: EOA }
+    type: formula
+    check: "library_count >= 1 and library_area_each_m2 >= 400"
+    code: NORM_AREA
+    severity: MINOR
+    message: "Library of 400 sq m required; declared {library_count} of {library_area_each_m2} sq m"
+    citation: { source: "APH 2024-27", clause: "Annexure-3, 3.2.1 A (Library)", page: 88 }
+
+  - id: INFRA-LANGUAGE-LAB
+    title: Language lab 33 sq m
+    applies_to: { category: EOA }
+    type: formula
+    check: "language_lab_count >= 1 and language_lab_area_each_m2 >= 33"
+    code: NORM_AREA
+    severity: MINOR
+    message: "Language lab of 33 sq m required; declared {language_lab_count} of {language_lab_area_each_m2} sq m"
+    citation: { source: "APH 2024-27", clause: "Annexure-3, 3.2.1 A (Language Laboratory)", page: 88 }
+
+  # ---- Computers and bandwidth (Annexure-4, p. 92)
+  - id: INFRA-PC-RATIO
+    title: PC to student ratio 1:10 for UG Engineering (minimum 20 PCs)
+    applies_to: { category: EOA }
+    type: formula
+    let: { required: "max(20, ceil(S_total / 10))" }
+    check: "pcs >= required"
+    code: NORM_PC_RATIO
+    severity: MAJOR
+    message: "PCs required {required}, declared {pcs}"
+    citation: { source: "APH 2024-27", clause: "Annexure-4, 4.1 (PC to student ratio)", page: 92 }
+
+  - id: INFRA-PRINTERS
+    title: Printers at least 5% of PCs
+    applies_to: { category: EOA }
+    type: formula
+    let: { required: "ceil(0.05 * pcs)" }
+    check: "printers >= required"
+    code: NORM_PC_RATIO
+    severity: MINOR
+    message: "Printers required {required}, declared {printers}"
+    citation: { source: "APH 2024-27", clause: "Annexure-4, 4.1 note 3 (printers)", page: 92 }
+
+  - id: INFRA-BANDWIDTH
+    title: Internet bandwidth by intake (100 / 300 / 500 Mbps / 1 Gbps)
+    applies_to: { category: EOA }
+    type: threshold
+    let: { required: "100 if annual_intake_total <= 300 else 300 if annual_intake_total <= 600 else 500 if annual_intake_total <= 900 else 1000" }
+    check: "bandwidth_mbps >= required"
+    code: NORM_BANDWIDTH
+    severity: MINOR
+    message: "Bandwidth required {required} Mbps, declared {bandwidth_mbps} Mbps"
+    citation: { source: "APH 2024-27", clause: "Annexure-4, 4.1 note 5 (bandwidth)", page: 92 }
+
+  # ---- 3-year EoA eligibility (p. 11): only evaluated when the institution claims it
+  - id: ELIG-3YR-NAAC
+    title: NAAC score of at least 3.01/4 supports a 3-year EoA claim
+    applies_to: { category: EOA }
+    when: "has_accreditation_claim"
+    type: threshold
+    check: "naac_listed_score >= 3.01 and naac_listed_score >= naac_claimed_score - 0.005"
+    code: ACCREDITATION_CLAIM_UNVERIFIED
+    severity: MAJOR
+    message: "Claimed NAAC score {naac_claimed_score}; accreditation list shows {naac_listed_score}"
+    citation: { source: "APH 2024-27", clause: "Clause 2.1 (a)(iv) (3-year EoA, NAAC 3.01)", page: 11 }

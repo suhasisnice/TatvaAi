@@ -1,0 +1,13 @@
+# Retention per document type, in years from upload. A job lists items past retention; nothing is deleted automatically in the demo.
+default_years: 7
+document_types:
+  AFFIDAVIT_2: 10
+  TER_RECEIPT: 10
+  OCCUPANCY_CERTIFICATE: 15
+  STRUCTURAL_STABILITY_CERTIFICATE: 15
+  FIRE_SAFETY_CERTIFICATE: 10
+  SATELLITE_MAP: 5
+  AUDITED_ACCOUNTS: 10
+  LAND_DOCUMENT: 25
+  FACULTY_LIST: 7
+  INFRA_PHOTO: 3

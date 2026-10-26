@@ -1,0 +1,64 @@
+x-backend: &backend
+  build:
+    context: .
+    dockerfile: backend/Dockerfile
+    args:
+      INSTALL_ML: ${INSTALL_ML:-false}
+  env_file: [.env.example]
+  environment:
+    DATABASE_URL: postgresql+psycopg://pramaan:pramaan@db:5432/pramaan
+    REDIS_URL: redis://redis:6379/0
+    TRUST_ROOT_PATH: /app/data/synthetic/pki/ca.pem
+    STORAGE_DIR: /app/storage
+  volumes:
+    - ./data:/app/data
+    - ./reports:/app/reports
+    - storage:/app/storage
+  depends_on:
+    db: { condition: service_healthy }
+    redis: { condition: service_healthy }
+
+services:
+  db:
+    image: postgis/postgis:16-3.4
+    environment: { POSTGRES_USER: pramaan, POSTGRES_PASSWORD: pramaan, POSTGRES_DB: pramaan }
+    volumes: [pgdata:/var/lib/postgresql/data]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U pramaan"]
+      interval: 5s
+      retries: 10
+  redis:
+    image: redis:7-alpine
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      retries: 10
+  minio:
+    image: minio/minio
+    command: server /data --console-address ":9001"
+    environment: { MINIO_ROOT_USER: minio, MINIO_ROOT_PASSWORD: minio12345 }
+    ports: ["9001:9001"]
+    volumes: [miniodata:/data]
+  mock-issuers:
+    build: { context: ., dockerfile: mock_issuers/Dockerfile }
+    ports: ["9000:9000"]
+    volumes: ["./data:/app/data:ro"]
+  backend:
+    <<: *backend
+    ports: ["8000:8000"]
+  worker:
+    <<: *backend
+    command: celery -A app.workers.celery_app.celery worker -l info
+  beat:
+    <<: *backend
+    command: celery -A app.workers.celery_app.celery beat -l info
+  frontend:
+    build: ./frontend
+    ports: ["5173:5173"]
+    environment: { VITE_API_URL: http://localhost:8000 }
+    depends_on: [backend]
+
+volumes:
+  pgdata:
+  miniodata:
+  storage:
